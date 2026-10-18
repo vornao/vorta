@@ -81,6 +81,72 @@ def sf_symbol_image(name: str, point_size: float, scale: float = 2.0, weight: st
         return None
 
 
+_click_count_guard = None
+
+
+def install_click_count_guard() -> bool:
+    """
+    Work around a Qt crash when the menu bar (tray) icon is clicked on macOS 27.
+
+    Qt (fixed upstream in qtbase 65020b4, not yet in any PyQt6 wheel) reads
+    `NSApp.currentEvent.clickCount` in QCocoaSystemTrayIcon::emitActivated(). On
+    macOS 27 that event is no longer a mouse event, and AppKit raises
+    NSInternalInconsistencyException, which terminates the app.
+
+    This wraps -[NSEvent clickCount]: mouse events still use AppKit's implementation;
+    every other event type, where AppKit would raise, reports 0 clicks.
+    """
+    global _click_count_guard
+    if not IS_MACOS:
+        return False
+    if _click_count_guard is not None:
+        return True
+    try:
+        import ctypes
+        import ctypes.util
+
+        libobjc = ctypes.CDLL(ctypes.util.find_library('objc'))
+        libobjc.objc_getClass.restype = ctypes.c_void_p
+        libobjc.objc_getClass.argtypes = [ctypes.c_char_p]
+        libobjc.sel_registerName.restype = ctypes.c_void_p
+        libobjc.sel_registerName.argtypes = [ctypes.c_char_p]
+        libobjc.class_getInstanceMethod.restype = ctypes.c_void_p
+        libobjc.class_getInstanceMethod.argtypes = [ctypes.c_void_p, ctypes.c_void_p]
+        libobjc.method_setImplementation.restype = ctypes.c_void_p
+        libobjc.method_setImplementation.argtypes = [ctypes.c_void_p, ctypes.c_void_p]
+
+        method = libobjc.class_getInstanceMethod(
+            libobjc.objc_getClass(b'NSEvent'), libobjc.sel_registerName(b'clickCount')
+        )
+        if not method:
+            return False
+
+        imp_type = ctypes.CFUNCTYPE(ctypes.c_long, ctypes.c_void_p, ctypes.c_void_p)
+        type_imp_type = ctypes.CFUNCTYPE(ctypes.c_ulong, ctypes.c_void_p, ctypes.c_void_p)
+        libobjc.method_getImplementation.restype = ctypes.c_void_p
+        libobjc.method_getImplementation.argtypes = [ctypes.c_void_p]
+        type_sel = libobjc.sel_registerName(b'type')
+        type_method = libobjc.class_getInstanceMethod(libobjc.objc_getClass(b'NSEvent'), type_sel)
+        event_type = type_imp_type(libobjc.method_getImplementation(type_method))
+
+        # Mouse event types, for which clickCount is valid (NSEventType values)
+        mouse_types = {1, 2, 3, 4, 5, 6, 7, 8, 9, 25, 26, 27}
+        original = None
+
+        def guarded_click_count(event, selector):
+            if event_type(event, type_sel) in mouse_types:
+                return original(event, selector)
+            return 0
+
+        guard = imp_type(guarded_click_count)
+        original = imp_type(libobjc.method_setImplementation(method, ctypes.cast(guard, ctypes.c_void_p)))
+        _click_count_guard = (guard, original, event_type)  # keep the callbacks alive
+        return True
+    except Exception:  # pragma: no cover
+        logger.warning('Could not install the NSEvent clickCount guard', exc_info=True)
+        return False
+
+
 def native_windows_available() -> bool:
     """True when Qt windows are backed by NSWindows (not e.g. the offscreen platform)."""
     from PyQt6.QtGui import QGuiApplication

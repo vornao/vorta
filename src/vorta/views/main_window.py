@@ -61,6 +61,7 @@ class MainWindow(MainWindowBase, MainWindowUI):
         super().__init__()
         self.app = parent
         theme.apply_theme(QApplication.instance())
+        platform_macos.install_click_count_guard()  # Qt tray crash on macOS 27, see the function
 
         self._native_chrome = platform_macos.native_windows_available()
         if self._native_chrome:
