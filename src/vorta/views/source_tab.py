@@ -20,6 +20,7 @@ from vorta.utils import (
 )
 from vorta.views.base_tab import BaseTab
 from vorta.views.dialogs.archive.exclude import ExcludeDialog
+from vorta.views.partials.empty_state import EmptyState
 from vorta.views.partials.sort_proxy import SortProxyModel
 from vorta.views.partials.source_files_table_model import SourceFilesModel
 from vorta.views.utils import get_colored_icon
@@ -42,6 +43,18 @@ class SourceTab(BaseTab, SourceBase, SourceUI):
         self.source_proxy = SortProxyModel(self)
         self.source_proxy.setSourceModel(self.source_model)
         self.sourceFilesWidget.setModel(self.source_proxy)
+
+        # Placeholder shown while the profile has no sources
+        self.emptyState = EmptyState(
+            'sources',
+            self.tr('No Sources'),
+            self.tr('Add the folders and files you want to back up.'),
+        )
+        self.emptyStateAddButton = self.emptyState.add_button(self.tr('Add Sources…'), default=True)
+        self.emptyStateAddButton.clicked.connect(self.source_add)
+        self.sourcesEmptyLayout.addWidget(self.emptyState)
+        for signal in (self.source_model.modelReset, self.source_model.rowsInserted, self.source_model.rowsRemoved):
+            signal.connect(self._update_empty_state)
 
         header = self.sourceFilesWidget.horizontalHeader()
         header.setSortIndicatorShown(1)
@@ -71,6 +84,10 @@ class SourceTab(BaseTab, SourceBase, SourceUI):
 
         # Listen for events
         self.track_palette_change()
+
+    def _update_empty_state(self, *_args):
+        has_sources = self.source_model.rowCount() > 0
+        self.sourcesStack.setCurrentWidget(self.sourceFilesWidget if has_sources else self.sourcesEmptyPage)
 
     def set_icons(self):
         "Used when changing between light- and dark mode"

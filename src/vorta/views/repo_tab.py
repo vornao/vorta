@@ -14,7 +14,8 @@ from vorta.views.dialogs.repo.repo_change_passphrase import ChangeBorgPassphrase
 from vorta.views.dialogs.repo.ssh import SSHAddWindow
 
 from .base_tab import BaseTab
-from .utils import get_colored_icon
+from .partials.empty_state import EmptyState
+from .utils import get_colored_icon, popup_menu
 
 uifile = get_asset('UI/repo_tab.ui')
 RepoUI, RepoBase = uic.loadUiType(uifile)
@@ -53,7 +54,17 @@ class RepoTab(BaseTab, RepoBase, RepoUI):
             get_colored_icon("key")
         )
 
-        self.bRepoUtil.setMenu(self.menuRepoUtil)
+        self.bRepoUtil.clicked.connect(lambda: popup_menu(self.bRepoUtil, self.menuRepoUtil))
+
+        # Placeholder shown until the first repository is added
+        self.emptyState = EmptyState(
+            'repository',
+            self.tr('No Repository'),
+            self.tr('Backups are stored in a Borg repository: a local folder, an external disk or a server.'),
+        )
+        self.emptyState.add_button(self.tr("Existing Repository…")).clicked.connect(self.add_existing_repo)
+        self.emptyState.add_button(self.tr("New Repository…"), default=True).clicked.connect(self.new_repo)
+        self.emptyStateLayout.addWidget(self.emptyState)
 
         # note: it is hard to describe these algorithms with attributes like low/medium/high
         # compression or speed on a unified scale. this is not 1-dimensional and also depends
@@ -106,7 +117,7 @@ class RepoTab(BaseTab, RepoBase, RepoUI):
     def set_icons(self):
         self.bAddSSHKey.setIcon(get_colored_icon("plus"))
         self.bAddRepo.setIcon(get_colored_icon("plus"))
-        self.bRepoUtil.setIcon(get_colored_icon("ellipsis-v"))
+        self.bRepoUtil.setIcon(get_colored_icon("more"))
         self.sshKeyToClipboardButton.setIcon(get_colored_icon('copy'))
         self.copyURLbutton.setIcon(get_colored_icon('copy'))
 
@@ -202,6 +213,10 @@ class RepoTab(BaseTab, RepoBase, RepoUI):
 
             self.repoEncryption.setText(na)
             self.repoEncryption.setToolTip(no_repo_selected)
+
+        has_repos = RepoModel.select().exists()
+        self.emptyStateSlot.setVisible(not has_repos)
+        self.repoContent.setVisible(has_repos)
 
         self.repo_changed.emit()
 

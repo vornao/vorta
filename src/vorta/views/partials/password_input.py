@@ -5,6 +5,7 @@ from PyQt6.QtGui import QAction
 from PyQt6.QtWidgets import QFormLayout, QLabel, QLineEdit, QWidget
 
 from vorta.i18n import translate
+from vorta.views import theme
 from vorta.views.utils import get_colored_icon
 
 
@@ -69,7 +70,7 @@ class PasswordLineEdit(QLineEdit):
         """Set error state and update style"""
         self._error_state = error
         if error:
-            self.setStyleSheet("QLineEdit { border: 2px solid red; }")
+            self.setStyleSheet(f"QLineEdit {{ border: 2px solid {theme.danger_color().name()}; border-radius: 4px; }}")
         else:
             self.setStyleSheet('')
 

@@ -11,6 +11,7 @@ from vorta.notifications import VortaNotifications
 from vorta.profile_export import ProfileExport
 from vorta.store.models import BackupProfileModel  # noqa: F401
 from vorta.utils import get_asset
+from vorta.views.partials.form_section import add_sheet_header
 
 uifile_import = get_asset('UI/dialogs/profile/export_window.ui')
 ExportWindowUI, ExportWindowBase = uic.loadUiType(uifile_import)
@@ -28,6 +29,11 @@ class ExportWindow(ExportWindowBase, ExportWindowUI):
         self.profile = profile
         self.setupUi(self)
         self.setWindowTitle(self.tr("Export Profile"))
+        add_sheet_header(
+            self.verticalLayout,
+            self.tr("Export Profile"),
+            self.tr("Save the settings of this profile to a file, for example to restore it on another computer."),
+        )
         self.buttonBox.accepted.connect(self.run)
         self.buttonBox.rejected.connect(self.reject)
 

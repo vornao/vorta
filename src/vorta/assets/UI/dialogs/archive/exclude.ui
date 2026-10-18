@@ -28,17 +28,23 @@
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_3">
        <item>
-       <widget class="QLabel" name="customPresetsHelpText">
-        <property name="text">
-         <string notr="true">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;%1&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-        </property>
-        <property name="wordWrap">
-         <bool>true</bool>
-        </property>
-       </widget>
+        <widget class="QLabel" name="customPresetsHelpText">
+         <property name="text">
+          <string notr="true">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;%1&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+         <property name="wordWrap">
+          <bool>true</bool>
+         </property>
+         <property name="textStyle" stdset="0">
+          <string>callout</string>
+         </property>
+         <property name="textRole" stdset="0">
+          <string>secondary</string>
+         </property>
+        </widget>
        </item>
        <item>
-        <widget class="QListView" name="customExclusionsList"/>
+        <widget class="QListView" name="customExclusionsList" />
        </item>
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout">
@@ -63,10 +69,10 @@
           </widget>
          </item>
          <item>
-          <widget class="QToolButton" name="bAddPattern"/>
+          <widget class="QToolButton" name="bAddPattern" />
          </item>
          <item>
-          <widget class="QToolButton" name="bRemovePattern"/>
+          <widget class="QToolButton" name="bRemovePattern" />
          </item>
         </layout>
        </item>
@@ -82,10 +88,16 @@
          <property name="wordWrap">
           <bool>true</bool>
          </property>
+         <property name="textStyle" stdset="0">
+          <string>callout</string>
+         </property>
+         <property name="textRole" stdset="0">
+          <string>secondary</string>
+         </property>
         </widget>
        </item>
        <item>
-        <widget class="QListView" name="exclusionPresetsList"/>
+        <widget class="QListView" name="exclusionPresetsList" />
        </item>
       </layout>
      </widget>
@@ -99,10 +111,16 @@
          <property name="wordWrap">
           <bool>true</bool>
          </property>
+         <property name="textStyle" stdset="0">
+          <string>callout</string>
+         </property>
+         <property name="textRole" stdset="0">
+          <string>secondary</string>
+         </property>
         </widget>
        </item>
        <item>
-        <widget class="QPlainTextEdit" name="rawExclusionsText"/>
+        <widget class="QPlainTextEdit" name="rawExclusionsText" />
        </item>
       </layout>
      </widget>
@@ -116,10 +134,16 @@
          <property name="wordWrap">
           <bool>true</bool>
          </property>
+         <property name="textStyle" stdset="0">
+          <string>callout</string>
+         </property>
+         <property name="textRole" stdset="0">
+          <string>secondary</string>
+         </property>
         </widget>
        </item>
        <item>
-        <widget class="QListView" name="excludeIfPresentList"/>
+        <widget class="QListView" name="excludeIfPresentList" />
        </item>
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_5">
@@ -137,10 +161,10 @@
           </spacer>
          </item>
          <item>
-          <widget class="QToolButton" name="bAddPatternExcludeIfPresent"/>
+          <widget class="QToolButton" name="bAddPatternExcludeIfPresent" />
          </item>
          <item>
-          <widget class="QToolButton" name="bRemovePatternExcludeIfPresent"/>
+          <widget class="QToolButton" name="bRemovePatternExcludeIfPresent" />
          </item>
         </layout>
        </item>
@@ -156,10 +180,16 @@
          <property name="wordWrap">
           <bool>true</bool>
          </property>
+         <property name="textStyle" stdset="0">
+          <string>callout</string>
+         </property>
+         <property name="textRole" stdset="0">
+          <string>secondary</string>
+         </property>
         </widget>
        </item>
        <item>
-        <widget class="QPlainTextEdit" name="exclusionsPreviewText"/>
+        <widget class="QPlainTextEdit" name="exclusionsPreviewText" />
        </item>
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_3">
@@ -198,6 +228,6 @@
    </item>
   </layout>
  </widget>
- <resources/>
- <connections/>
+ <resources />
+ <connections />
 </ui>

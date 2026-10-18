@@ -48,7 +48,7 @@
        <item>
         <widget class="QLabel" name="alertImage">
          <property name="text">
-          <string/>
+          <string />
          </property>
         </widget>
        </item>
@@ -78,23 +78,27 @@
          </property>
          <item>
           <widget class="QLabel" name="title_label">
-           <property name="font">
-            <font>
-             <bold>true</bold>
-            </font>
-           </property>
            <property name="text">
             <string>Vorta quit unexpectedly. </string>
+           </property>
+           <property name="textStyle" stdset="0">
+            <string>title3</string>
            </property>
           </widget>
          </item>
          <item>
           <widget class="QLabel" name="report_to_github_label">
-         <property name="text">
-          <string notr="true">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;%1&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-         </property>
+           <property name="text">
+            <string notr="true">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;%1&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           </property>
            <property name="wordWrap">
             <bool>true</bool>
+           </property>
+           <property name="textStyle" stdset="0">
+            <string>callout</string>
+           </property>
+           <property name="textRole" stdset="0">
+            <string>secondary</string>
            </property>
           </widget>
          </item>
@@ -149,10 +153,10 @@
        </item>
        <item>
         <widget class="QDialogButtonBox" name="ignoreButton">
-       <property name="standardButtons">
-        <set>QDialogButtonBox::Close</set>
-       </property>
-      </widget>
+         <property name="standardButtons">
+          <set>QDialogButtonBox::Close</set>
+         </property>
+        </widget>
        </item>
        <item>
         <widget class="QPushButton" name="copyButton">
@@ -167,6 +171,6 @@
    </item>
   </layout>
  </widget>
- <resources/>
- <connections/>
+ <resources />
+ <connections />
 </ui>

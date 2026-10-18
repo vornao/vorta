@@ -3,18 +3,19 @@ import sys
 from pathlib import Path
 
 from PyQt6 import QtCore, uic
-from PyQt6.QtCore import QPoint, Qt, QTimer
+from PyQt6.QtCore import QEvent, QPoint, Qt, QTimer, QUrl
 from PyQt6.QtCore import pyqtSignal as Signal
-from PyQt6.QtGui import QFontMetrics, QKeySequence, QShortcut
+from PyQt6.QtGui import QAction, QDesktopServices, QKeySequence, QShortcut
 from PyQt6.QtWidgets import (
     QApplication,
     QCheckBox,
     QFileDialog,
-    QListWidgetItem,
+    QMenu,
     QMessageBox,
     QToolTip,
 )
 
+from vorta import config
 from vorta.profile_export import ImportFailedException, ProfileExport
 from vorta.store.models import BackupProfileModel, SettingsModel
 from vorta.utils import (
@@ -23,11 +24,17 @@ from vorta.utils import (
     get_network_status_monitor,
     is_system_tray_available,
 )
+from vorta.views import platform_macos, theme
+from vorta.views.about_window import AboutWindow
+from vorta.views.activity_page import ActivityPage
 from vorta.views.dialogs.profile.export_window import ExportWindow
 from vorta.views.dialogs.profile.import_window import ImportWindow
 from vorta.views.dialogs.profile.profile_add_edit import AddProfileWindow, EditProfileWindow
+from vorta.views.overview_page import OverviewPage
 from vorta.views.partials.loading_button import LoadingButton
-from vorta.views.utils import get_colored_icon
+from vorta.views.partials.sidebar import PAGE_ROLE
+from vorta.views.settings_window import SettingsWindow
+from vorta.views.utils import get_colored_icon, popup_menu
 
 from .about_tab import AboutTab
 from .archive_tab import ArchiveTab
@@ -41,31 +48,62 @@ MainWindowUI, MainWindowBase = uic.loadUiType(uifile)
 
 logger = logging.getLogger(__name__)
 
+__all__ = ['MainWindow', 'ArchiveTab']
+
 
 class MainWindow(MainWindowBase, MainWindowUI):
     loaded = Signal()
 
+    # page key -> index in pageStack
+    PAGES = ['overview', 'sources', 'repository', 'schedule', 'archives', 'activity']
+
     def __init__(self, parent=None):
         super().__init__()
+        self.app = parent
+        theme.apply_theme(QApplication.instance())
+
+        self._native_chrome = platform_macos.native_windows_available()
+        if self._native_chrome:
+            self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
+            self.setAttribute(Qt.WidgetAttribute.WA_ContentsMarginsRespectsSafeArea, False)
         self.setupUi(self)
         self.setWindowTitle('Vorta for Borg Backup')
-        self.app = parent
         self.setWindowIcon(get_colored_icon("icon"))
         if sys.platform.startswith('linux'):
             self.app.setDesktopFileName('com.borgbase.Vorta')
-        self.setWindowFlags(QtCore.Qt.WindowType.WindowCloseButtonHint | QtCore.Qt.WindowType.WindowMinimizeButtonHint)
-        self.createStartBtn = LoadingButton(self.tr("Start Backup"))
-        self.gridLayout.addWidget(self.createStartBtn, 0, 0, 1, 1)
-        self.createStartBtn.setGif(get_asset("icons/loading"))
+        flags = (
+            Qt.WindowType.Window
+            | Qt.WindowType.WindowTitleHint
+            | Qt.WindowType.WindowCloseButtonHint
+            | Qt.WindowType.WindowMinMaxButtonsHint
+        )
+        if self._native_chrome:
+            flags |= Qt.WindowType.NoTitleBarBackgroundHint | Qt.WindowType.WindowFullscreenButtonHint
+        self.setWindowFlags(flags)
+        self.chrome = platform_macos.WindowChrome(self)
+        # Header: title and subtitle vertically centred in the toolbar area, next to the traffic lights
+        self.titleLayout.insertStretch(0, 1)
+        self.titleLayout.addStretch(1)
+        self.headerLayout.setStretchFactor(self.titleLayout, 1)
+        self.pageTitle.setMinimumWidth(120)
+        for area in (self.repoScrollArea, self.scheduleScrollArea):
+            area.viewport().setAutoFillBackground(False)
 
-        # set log label height to two lines
-        fontmetrics: QFontMetrics = self.logText.fontMetrics()
-        self.logText.setMinimumHeight(fontmetrics.lineSpacing() * 2 + fontmetrics.leading())
+        self.createStartBtn = LoadingButton(self.tr("Back Up Now"))
+        self.createStartBtn.setDefault(True)
+        self.createStartBtn.setAutoDefault(False)
+        self.createStartBtn.setToolTip(self.tr("Start a backup of the current profile now"))
+        self.gridLayout.addWidget(self.createStartBtn, 0, 0, 1, 1)
+        self.cancelButton.setToolTip(self.tr("Cancel the running task"))
+        self.cancelButton.hide()
 
         # Use previous window state
         previous_window_width = SettingsModel.get(key='previous_window_width')
         previous_window_height = SettingsModel.get(key='previous_window_height')
-        self.resize(int(previous_window_width.str_value), int(previous_window_height.str_value))
+        self.resize(
+            max(int(previous_window_width.str_value), self.minimumWidth()),
+            max(int(previous_window_height.str_value), self.minimumHeight()),
+        )
 
         # Select previously used profile, if available
         prev_profile_id = SettingsModel.get(key='previous_profile_id')
@@ -74,65 +112,226 @@ class MainWindow(MainWindowBase, MainWindowUI):
             profiles = BackupProfileModel.select()
             self.current_profile = min(profiles, key=lambda p: (p.name.casefold(), p.name))
 
+        # Secondary windows host the global settings and the about page
+        self.settingsWindow = SettingsWindow(self)
+        self.aboutWindow = AboutWindow(self)
+
         # Load tab models
         self.repoTab = RepoTab(self.repoTabSlot, profile_provider=self.get_current_profile)
         self.sourceTab = SourceTab(self.sourceTabSlot, profile_provider=self.get_current_profile)
         self.archiveTab = ArchiveTab(self.archiveTabSlot, app=self.app, profile_provider=self.get_current_profile)
         self.scheduleTab = ScheduleTab(self.scheduleTabSlot, profile_provider=self.get_current_profile)
-        self.miscTab = MiscTab(self.SettingsTabSlot, profile_provider=self.get_current_profile)
-        self.aboutTab = AboutTab(self.AboutTabSlot, profile_provider=self.get_current_profile)
+        self.miscTab = MiscTab(self.settingsWindow.contentSlot, profile_provider=self.get_current_profile)
+        self.aboutTab = AboutTab(self.aboutWindow.contentSlot, profile_provider=self.get_current_profile)
         self.aboutTab.set_borg_details(borg_compat.version, borg_compat.path)
-        self.miscWidget.hide()
-        self.tabWidget.setCurrentIndex(0)
+        self.scheduleTab.add_retention_page(self.archiveTab.retentionPage)
+        self.activityPage = ActivityPage(
+            self.activityTabSlot, self.scheduleTab.jobsPage, self.scheduleTab.logPage, open_logs=self.open_log_folder
+        )
+        self.overviewPage = OverviewPage(
+            self.overviewTabSlot,
+            app=self.app,
+            profile_provider=self.get_current_profile,
+            navigate=self.show_page,
+            start_backup=lambda: self.createStartBtn.click(),
+        )
 
         self.repoTab.repo_changed.connect(self.archiveTab.populate_from_profile)
         self.repoTab.repo_changed.connect(self.scheduleTab.schedulePage.populate_from_profile)
+        self.repoTab.repo_changed.connect(self.overviewPage.populate_from_profile)
+        self.repoTab.repo_changed.connect(self.update_header)
         self.repoTab.repo_added.connect(self.archiveTab.refresh_archive_list)
         self.miscTab.refresh_archive.connect(self.archiveTab.populate_from_profile)
 
-        self.miscButton.clicked.connect(self.toggle_misc_visibility)
         self.createStartBtn.clicked.connect(self.app.create_backup_action)
         self.cancelButton.clicked.connect(self.app.backup_cancelled_event.emit)
-
-        QShortcut(QKeySequence("Ctrl+W"), self).activated.connect(self.on_close_window)
-        QShortcut(QKeySequence("Ctrl+Q"), self).activated.connect(self.on_close_window)
 
         self.app.backup_started_event.connect(self.backup_started_event)
         self.app.backup_finished_event.connect(self.backup_finished_event)
         self.app.backup_log_event.connect(self.set_log)
         self.app.backup_progress_event.connect(self.set_progress)
         self.app.backup_cancelled_event.connect(self.backup_cancelled_event)
+        self.app.profile_changed_event.connect(self.update_header)
+
+        # Sidebar navigation
+        self.sidebar.add_page('overview', self.tr('Overview'), 'overview')
+        self.sidebar.add_header(self.tr('Backup'))
+        self.sidebar.add_page('sources', self.tr('Sources'), 'sources')
+        self.sidebar.add_page('repository', self.tr('Repository'), 'repository')
+        self.sidebar.add_page('schedule', self.tr('Schedule'), 'schedule')
+        self.sidebar.add_header(self.tr('History'))
+        self.sidebar.add_page('archives', self.tr('Archives'), 'archives')
+        self.sidebar.add_page('activity', self.tr('Activity'), 'activity')
+        self.sidebar.page_selected.connect(self.show_page)
+        self.headerActionsLayout.addWidget(self.archiveTab.bList)
+        self._header_actions = {'archives': [self.archiveTab.bList]}
+
+        # Actions shared by the menu bar and the profile menu
+        self._create_actions()
+        self.profileMenuButton.clicked.connect(lambda: popup_menu(self.profileMenuButton, self.profileMenu))
+        self.miscButton.clicked.connect(self.show_settings)
+        if platform_macos.IS_MACOS:
+            self.miscButton.hide()  # Settings lives in the app menu (⌘,)
+        self._create_menu_bar()
 
         # Init profile list
         self.populate_profile_selector()
-        self.profileSelector.itemClicked.connect(self.profile_clicked_action)
-        self.profileSelector.currentItemChanged.connect(self.profile_selection_changed_action)
-        self.profileRenameButton.clicked.connect(self.profile_rename_action)
-        self.profileExportButton.clicked.connect(self.profile_export_action)
-        self.profileDeleteButton.clicked.connect(self.profile_delete_action)
-        self.profileAddButton.addAction(self.tr("Create new profile"), self.profile_add_action)
-        self.profileAddButton.addAction(self.tr("Import from file…"), self.profile_import_action)
+        self.profileSelector.currentIndexChanged.connect(self.profile_selection_changed_action)
 
         # OS-specific startup options:
         if not get_network_status_monitor().is_network_status_available():
             # Hide Wifi-rule section in schedule tab.
             self.scheduleTab.networksPage.wifiListLabel.hide()
             self.scheduleTab.networksPage.wifiListWidget.hide()
-            self.scheduleTab.page_2.hide()
-            self.scheduleTab.toolBox.removeItem(1)
+            self.scheduleTab.hide_networks()
 
         # Connect to existing thread.
         if self.app.jobs_manager.is_worker_running():
-            self.createStartBtn.setEnabled(False)
-            self.createStartBtn.start()
-            self.cancelButton.setEnabled(True)
+            self._toggle_buttons(create_enabled=False)
 
         # Connect to palette change
         self._palette_connection = QApplication.instance().paletteChanged.connect(lambda p: self.set_icons())
         self.destroyed.connect(self._on_destroyed)
 
+        self.show_page('overview')
         self.set_icons()
         self.loaded.emit()
+
+    # --- actions & menus -------------------------------------------------------------------------------------------
+    def _action(self, text, slot, shortcut=None, role=None, icon=None):
+        action = QAction(text, self)
+        action.triggered.connect(slot)
+        if shortcut is not None:
+            action.setShortcut(QKeySequence(shortcut))
+        if role is not None:
+            action.setMenuRole(role)
+        if icon is not None:
+            action.setIcon(get_colored_icon(icon))
+            action.setIconVisibleInMenu(False)
+        return action
+
+    def _create_actions(self):
+        self.backupAction = self._action(self.tr('Back Up Now'), lambda: self.createStartBtn.click(), 'Ctrl+B')
+        self.cancelAction = self._action(
+            self.tr('Cancel'), lambda: self.cancelButton.click(), QKeySequence(Qt.Modifier.CTRL | Qt.Key.Key_Period)
+        )
+        self.cancelAction.setEnabled(False)
+        self.profileAddAction = self._action(
+            self.tr("Create new profile"), self.profile_add_action, 'Ctrl+N', icon='plus'
+        )
+        self.profileImportAction = self._action(self.tr("Import from file…"), self.profile_import_action)
+        self.profileRenameAction = self._action(self.tr('Rename Profile…'), self.profile_rename_action, icon='edit')
+        self.profileExportAction = self._action(self.tr('Export Profile…'), self.profile_export_action)
+        self.profileDeleteAction = self._action(self.tr('Delete Profile…'), self.profile_delete_action, icon='trash')
+        self.settingsAction = self._action(
+            self.tr('Settings…'),
+            self.show_settings,
+            QKeySequence.StandardKey.Preferences,
+            QAction.MenuRole.PreferencesRole,
+        )
+        self.aboutAction = self._action(self.tr('About Vorta'), self.show_about, role=QAction.MenuRole.AboutRole)
+        self.closeAction = self._action(self.tr('Close Window'), self.on_close_window, QKeySequence.StandardKey.Close)
+        self.pageActions = []
+        for number, key in enumerate(self.PAGES, start=1):
+            item = self._sidebar_item(key)
+            text = item.text() if item is not None else key.title()
+            self.pageActions.append(self._action(text, lambda _=False, k=key: self.show_page(k), f'Ctrl+{number}'))
+
+        self.profileMenu = QMenu(self)
+        for action in (self.profileAddAction, self.profileImportAction):
+            self.profileMenu.addAction(action)
+        self.profileMenu.addSeparator()
+        for action in (self.profileRenameAction, self.profileExportAction, self.profileDeleteAction):
+            self.profileMenu.addAction(action)
+
+    def _create_menu_bar(self):
+        if not platform_macos.IS_MACOS:
+            # No menu bar on Linux; keep the keyboard shortcuts on the window.
+            for action in (self.backupAction, self.cancelAction, self.profileAddAction, self.settingsAction):
+                self.addAction(action)
+            self.addActions(self.pageActions)
+            QShortcut(QKeySequence("Ctrl+W"), self).activated.connect(self.on_close_window)
+            QShortcut(QKeySequence("Ctrl+Q"), self).activated.connect(self.on_close_window)
+            return
+
+        menu_bar = self.menuBar()
+        quit_action = self._action(self.tr('Quit Vorta'), self.app.quit, QKeySequence.StandardKey.Quit)
+        quit_action.setMenuRole(QAction.MenuRole.QuitRole)
+
+        file_menu = menu_bar.addMenu(self.tr('File'))
+        file_menu.addAction(self.backupAction)
+        file_menu.addAction(self.cancelAction)
+        file_menu.addSeparator()
+        file_menu.addAction(self.profileAddAction)
+        file_menu.addAction(self.profileImportAction)
+        file_menu.addAction(self.profileExportAction)
+        file_menu.addSeparator()
+        file_menu.addAction(self.closeAction)
+        file_menu.addAction(self.settingsAction)
+        file_menu.addAction(self.aboutAction)
+        file_menu.addAction(quit_action)
+
+        view_menu = menu_bar.addMenu(self.tr('View'))
+        view_menu.addActions(self.pageActions)
+
+        help_menu = menu_bar.addMenu(self.tr('Help'))
+        help_menu.addAction(
+            self._action(self.tr('Vorta Help'), lambda: QDesktopServices.openUrl(QUrl('https://vorta.borgbase.com/')))
+        )
+        help_menu.addAction(
+            self._action(
+                self.tr('Report a Bug…'),
+                lambda: QDesktopServices.openUrl(QUrl('https://github.com/borgbase/vorta/issues/new/choose')),
+            )
+        )
+        help_menu.addAction(self._action(self.tr('View the logs'), self.open_log_folder))
+
+    def _sidebar_item(self, key):
+        for row in range(self.sidebar.count()):
+            item = self.sidebar.item(row)
+            if item.data(PAGE_ROLE) == key:
+                return item
+        return None
+
+    # --- navigation ------------------------------------------------------------------------------------------------
+    def show_page(self, key: str) -> None:
+        index = self.PAGES.index(key)
+        if self.pageStack.currentIndex() != index:
+            self.pageStack.setCurrentIndex(index)
+        if self.sidebar.current_page() != key:
+            self.sidebar.select_page(key)
+        for page, widgets in self._header_actions.items():
+            for widget in widgets:
+                widget.setVisible(page == key)
+        self.update_header()
+
+    def current_page(self) -> str:
+        return self.PAGES[self.pageStack.currentIndex()]
+
+    def update_header(self, *_args) -> None:
+        key = self.current_page()
+        item = self._sidebar_item(key)
+        self.pageTitle.setText(item.text() if item is not None else '')
+        profile = self.current_profile
+        subtitle = profile.name if profile is not None else ''
+        if key in ('repository', 'archives'):
+            repo = BackupProfileModel.get(id=profile.id).repo
+            if repo is not None:
+                subtitle = repo.name or repo.url
+        self.pageSubtitle.setText(subtitle)
+
+    def show_settings(self):
+        self.settingsWindow.present()
+
+    def show_about(self):
+        self.aboutWindow.present()
+
+    def open_log_folder(self):
+        QDesktopServices.openUrl(QUrl.fromLocalFile(str(config.LOG_DIR)))
+
+    # Kept for compatibility: Settings and About used to replace the tabs in place.
+    def toggle_misc_visibility(self):
+        self.show_settings()
 
     def on_close_window(self):
         self.close()
@@ -141,11 +340,10 @@ class MainWindow(MainWindowBase, MainWindowUI):
         return BackupProfileModel.get(id=self.current_profile.id)
 
     def set_icons(self):
-        self.profileAddButton.setIcon(get_colored_icon('plus'))
-        self.profileRenameButton.setIcon(get_colored_icon('edit'))
-        self.profileExportButton.setIcon(get_colored_icon('file-import-solid'))
-        self.profileDeleteButton.setIcon(get_colored_icon('minus'))
+        self.profileMenuButton.setIcon(get_colored_icon('more'))
         self.miscButton.setIcon(get_colored_icon('settings_wheel'))
+        self.chrome.set_background(theme.window_color())
+        self.sidebar.viewport().update()
 
     def _on_destroyed(self):
         try:
@@ -153,6 +351,7 @@ class MainWindow(MainWindowBase, MainWindowUI):
         except (TypeError, RuntimeError):
             pass
 
+    # --- status ----------------------------------------------------------------------------------------------------
     def set_progress(self, text=''):
         self.progressText.setText(text)
         self.progressText.repaint()
@@ -167,38 +366,35 @@ class MainWindow(MainWindowBase, MainWindowUI):
     def _toggle_buttons(self, create_enabled=True):
         if create_enabled:
             self.createStartBtn.stop()
+            self.activityIndicator.stop()
         else:
             self.createStartBtn.start()
+            self.activityIndicator.start()
         self.createStartBtn.setEnabled(create_enabled)
-        self.createStartBtn.repaint()
+        self.createStartBtn.setVisible(create_enabled)
         self.cancelButton.setEnabled(not create_enabled)
-        self.cancelButton.repaint()
+        self.cancelButton.setVisible(not create_enabled)
+        self.backupAction.setEnabled(create_enabled)
+        self.cancelAction.setEnabled(not create_enabled)
+        self.overviewPage.set_running(not create_enabled)
 
+    # --- profiles --------------------------------------------------------------------------------------------------
     def populate_profile_selector(self):
-        # Clear the previous entries
-        self.profileSelector.clear()
+        self.profileSelector.blockSignals(True)
+        try:
+            self.profileSelector.clear()
+            profiles = BackupProfileModel.select()
+            for profile in sorted(profiles, key=lambda p: (p.name.casefold(), p.name)):
+                self.profileSelector.addItem(get_colored_icon('profile'), profile.name, profile.id)
+            index = self.profileSelector.findData(self.current_profile.id)
+            if index >= 0:
+                self.profileSelector.setCurrentIndex(index)
+        finally:
+            self.profileSelector.blockSignals(False)
+        self.profileDeleteAction.setEnabled(self.profileSelector.count() > 1)
 
-        # Keep track of the current item to be selected (if any)
-        current_item = None
-
-        # Add items to the QListWidget
-        profiles = BackupProfileModel.select()
-        for profile in sorted(profiles, key=lambda p: (p.name.casefold(), p.name)):
-            item = QListWidgetItem(profile.name)
-            item.setData(Qt.ItemDataRole.UserRole, profile.id)
-
-            self.profileSelector.addItem(item)
-
-            if profile.id == self.current_profile.id:
-                current_item = item
-
-        # Set the current profile as selected
-        if current_item:
-            self.profileSelector.setCurrentItem(current_item)
-
-    def profile_selection_changed_action(self, index):
-        profile = self.profileSelector.currentItem()
-        backup_profile_id = profile.data(Qt.ItemDataRole.UserRole) if profile else None
+    def profile_selection_changed_action(self, index=None):
+        backup_profile_id = self.profileSelector.currentData()
         if not backup_profile_id:
             return
 
@@ -209,22 +405,17 @@ class MainWindow(MainWindowBase, MainWindowUI):
 
         self.app.profile_changed_event.emit()
 
-    def profile_clicked_action(self):
-        if self.miscWidget.isVisible():
-            self.toggle_misc_visibility()
-
     def profile_rename_action(self):
-        backup_profile_id = self.profileSelector.currentItem().data(Qt.ItemDataRole.UserRole)
+        backup_profile_id = self.profileSelector.currentData()
         window = EditProfileWindow(rename_existing_id=backup_profile_id)
         self.window = window  # For tests
         window.setParent(self, QtCore.Qt.WindowType.Sheet)
         window.open()
         window.profile_changed.connect(self.profile_add_edit_result)
-        window.rejected.connect(lambda: self.profileSelector.setCurrentIndex(self.profileSelector.currentIndex()))
 
     def profile_delete_action(self):
         if self.profileSelector.count() > 1:
-            to_delete_id = self.profileSelector.currentItem().data(Qt.ItemDataRole.UserRole)
+            to_delete_id = self.profileSelector.currentData()
             to_delete = BackupProfileModel.get(id=to_delete_id)
 
             msg = self.tr("Are you sure you want to delete profile '{}'?").format(to_delete.name)
@@ -240,13 +431,16 @@ class MainWindow(MainWindowBase, MainWindowUI):
                 self.app.scheduler.clear_pause(to_delete_id)  # Drop a pause the deleted id could outlive
                 to_delete.delete_instance(recursive=True)
                 self.app.scheduler.remove_job(to_delete_id)  # Remove pending jobs
-                self.profileSelector.takeItem(self.profileSelector.currentRow())
-                self.profile_selection_changed_action(0)
+                self.profileSelector.blockSignals(True)
+                self.profileSelector.removeItem(self.profileSelector.currentIndex())
+                self.profileSelector.blockSignals(False)
+                self.profileDeleteAction.setEnabled(self.profileSelector.count() > 1)
+                self.profile_selection_changed_action()
 
         else:
             warn = self.tr("Cannot delete the last profile.")
-            point = QPoint(0, int(self.profileDeleteButton.size().height() / 2))
-            QToolTip.showText(self.profileDeleteButton.mapToGlobal(point), warn)
+            point = QPoint(0, int(self.profileMenuButton.size().height() / 2))
+            QToolTip.showText(self.profileMenuButton.mapToGlobal(point), warn)
 
     def profile_add_action(self):
         window = AddProfileWindow()
@@ -254,7 +448,6 @@ class MainWindow(MainWindowBase, MainWindowUI):
         window.setParent(self, QtCore.Qt.WindowType.Sheet)
         window.open()
         window.profile_changed.connect(self.profile_add_edit_result)
-        window.rejected.connect(lambda: self.profileSelector.setCurrentIndex(self.profileSelector.currentIndex()))
 
     def profile_export_action(self):
         """
@@ -300,37 +493,15 @@ class MainWindow(MainWindowBase, MainWindowUI):
             window.show()
 
     def profile_add_edit_result(self, profile_name, profile_id):
-        # Profile is renamed
-        if self.profileSelector.currentItem().data(Qt.ItemDataRole.UserRole) == profile_id:
-            profile = self.profileSelector.takeItem(self.profileSelector.currentRow())
-            profile.setText(profile_name)
-        # Profile is added
+        changed = profile_id != self.current_profile.id
+        self.current_profile = BackupProfileModel.get(id=profile_id)
+        self.populate_profile_selector()
+        if changed:
+            self.profile_selection_changed_action()
         else:
-            profile = QListWidgetItem(profile_name)
-            profile.setData(Qt.ItemDataRole.UserRole, profile_id)
-        # Insert the profile at the correct position
-        # Both the casefolded and the original name are used as the key to keep the order stable
-        profile_key = (profile.text().casefold(), profile.text())
-        row = 0
-        for i in range(self.profileSelector.count()):
-            item_name = self.profileSelector.item(i).text()
-            if (item_name.casefold(), item_name) < profile_key:
-                row += 1
-        self.profileSelector.insertItem(row, profile)
-        self.profileSelector.setCurrentItem(profile)
+            self.update_header()
 
-    def toggle_misc_visibility(self):
-        if self.miscWidget.isVisible():
-            self.miscWidget.hide()
-            self.tabWidget.setCurrentIndex(0)
-            self.miscButton.setStyleSheet("font-weight: normal;")
-            self.tabWidget.show()
-        else:
-            self.tabWidget.hide()
-            self.miscWidget.setCurrentIndex(0)
-            self.miscButton.setStyleSheet("font-weight: bold;")
-            self.miscWidget.show()
-
+    # --- backup events ---------------------------------------------------------------------------------------------
     def backup_started_event(self):
         self._toggle_buttons(create_enabled=False)
         self.archiveTab._toggle_all_buttons(enabled=False)
@@ -346,6 +517,35 @@ class MainWindow(MainWindowBase, MainWindowUI):
     def backup_cancelled_event(self):
         self._toggle_buttons(create_enabled=True)
         self.set_log(self.tr('Task cancelled'))
+
+    # --- window lifecycle ------------------------------------------------------------------------------------------
+    def showEvent(self, event):
+        super().showEvent(event)
+        platform_macos.update_app_presence()
+        if self._native_chrome and not self.chrome.installed:
+            QTimer.singleShot(0, self._install_chrome)
+
+    def _install_chrome(self):
+        installed = self.chrome.install()
+        self.sidebarPane.set_native_backdrop(installed)
+        if installed:
+            self.chrome.set_background(theme.window_color())
+            self._sync_sidebar_backdrop()
+
+    def _sync_sidebar_backdrop(self):
+        if self.chrome.installed:
+            rect = self.sidebarPane.geometry() if self.sidebarPane.isVisible() else None
+            self.chrome.set_sidebar_rect(rect)
+
+    def resizeEvent(self, event):
+        super().resizeEvent(event)
+        self.chrome.ensure()
+        self._sync_sidebar_backdrop()
+
+    def changeEvent(self, event):
+        super().changeEvent(event)
+        if event.type() in (QEvent.Type.WindowStateChange, QEvent.Type.ActivationChange):
+            self.chrome.ensure()
 
     def closeEvent(self, event):
         # Save window state in SettingsModel
@@ -387,4 +587,7 @@ class MainWindow(MainWindowBase, MainWindowUI):
 
     def _release_native_window(self):
         if not self.isVisible():
+            platform_macos.update_app_presence()
+            self.chrome.remove()
+            self.sidebarPane.set_native_backdrop(False)
             self.destroy()  # show() creates the native window again

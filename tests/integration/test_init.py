@@ -74,7 +74,7 @@ def test_add_existing_repo(qapp, qtbot, monkeypatch, choose_file_dialog):
     main = qapp.main_window
     tab = main.repoTab
 
-    main.tabWidget.setCurrentIndex(0)
+    main.show_page('repository')
     current_repo_path = vorta.store.models.RepoModel.select().first().url
 
     monkeypatch.setattr(QMessageBox, "show", lambda *args: True)

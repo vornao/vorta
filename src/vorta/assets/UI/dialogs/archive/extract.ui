@@ -24,18 +24,18 @@
        <property name="text">
         <string>Archive:</string>
        </property>
+       <property name="textRole" stdset="0">
+        <string>secondary</string>
+       </property>
       </widget>
      </item>
      <item>
       <widget class="QLabel" name="archiveNameLabel">
-       <property name="font">
-        <font>
-         <weight>75</weight>
-         <bold>true</bold>
-        </font>
-       </property>
        <property name="text">
         <string>nyx2.local-2018-11-16T09:49:58 from November 16, 2018</string>
+       </property>
+       <property name="textStyle" stdset="0">
+        <string>headline</string>
        </property>
       </widget>
      </item>
@@ -122,6 +122,6 @@
    </item>
   </layout>
  </widget>
- <resources/>
- <connections/>
+ <resources />
+ <connections />
 </ui>

@@ -17,7 +17,7 @@ def source_env(qapp, qtbot):
     main.show()
     qtbot.waitUntil(main.isVisible, **pytest._wait_defaults)
 
-    main.tabWidget.setCurrentIndex(1)  # activate source tab
+    main.show_page('sources')  # activate source tab
     tab = main.sourceTab
 
     qtbot.waitUntil(tab.isVisible, **pytest._wait_defaults)  # wait for the tab

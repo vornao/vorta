@@ -6,112 +6,144 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>687</width>
-    <height>544</height>
+    <width>720</width>
+    <height>900</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QGridLayout" name="gridLayout">
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <property name="spacing">
+    <number>8</number>
+   </property>
    <property name="leftMargin">
-    <number>0</number>
+    <number>24</number>
+   </property>
+   <property name="topMargin">
+    <number>8</number>
    </property>
    <property name="rightMargin">
-    <number>0</number>
+    <number>24</number>
    </property>
-   <item row="1" column="0">
-    <widget class="QToolBox" name="toolBox">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
+   <property name="bottomMargin">
+    <number>24</number>
+   </property>
+   <item>
+    <layout class="QVBoxLayout" name="scheduleLayout">
+     <property name="spacing">
+      <number>0</number>
      </property>
-     <property name="font">
-      <font>
-       <bold>false</bold>
-      </font>
+    </layout>
+   </item>
+   <item>
+    <layout class="QVBoxLayout" name="retentionLayout">
+     <property name="spacing">
+      <number>0</number>
      </property>
-     <widget class="QWidget" name="page_1">
-      <property name="geometry">
-       <rect>
-        <x>0</x>
-        <y>0</y>
-        <width>687</width>
-        <height>384</height>
-       </rect>
-      </property>
-      <attribute name="label">
-       <string>Schedule</string>
-      </attribute>
-      <layout class="QGridLayout" name="scheduleLayout">
-      </layout>
-      </widget>
-     <widget class="QWidget" name="page_2">
-      <property name="geometry">
-       <rect>
-        <x>0</x>
-        <y>0</y>
-        <width>687</width>
-        <height>384</height>
-       </rect>
-      </property>
-      <attribute name="label">
-       <string>Networks</string>
-      </attribute>
-      <layout class="QGridLayout" name="networksLayout">
-      </layout>
-      </widget>
-     <widget class="QWidget" name="page">
-      <property name="geometry">
-       <rect>
-        <x>0</x>
-        <y>0</y>
-        <width>687</width>
-        <height>384</height>
-       </rect>
-      </property>
-      <attribute name="label">
-       <string>Log</string>
-      </attribute>
-      <layout class="QGridLayout" name="logLayout">
-      </layout>
-      </widget>
-     <widget class="QWidget" name="page">
-      <property name="geometry">
-       <rect>
-        <x>0</x>
-        <y>0</y>
-        <width>687</width>
-        <height>384</height>
-       </rect>
-      </property>
-      <attribute name="label">
-       <string>Shell Commands</string>
-      </attribute>
-      <layout class="QGridLayout" name="shellCommandsLayout">
-      </layout>
-      </widget>
-     <widget class="QWidget" name="page_jobs">
-      <property name="geometry">
-       <rect>
-        <x>0</x>
-        <y>0</y>
-        <width>687</width>
-        <height>384</height>
-       </rect>
-      </property>
-      <attribute name="label">
-       <string>Jobs</string>
-      </attribute>
-      <layout class="QGridLayout" name="jobsLayout">
-      </layout>
-      </widget>
+    </layout>
+   </item>
+   <item>
+    <widget class="QLabel" name="networksTitle">
+     <property name="text">
+      <string>Networks</string>
+     </property>
+     <property name="textStyle" stdset="0">
+      <string>headline</string>
+     </property>
+     <property name="indent">
+      <number>8</number>
+     </property>
     </widget>
+   </item>
+   <item>
+    <widget class="FormSection" name="networksSection">
+     <layout class="QVBoxLayout" name="networksLayout">
+      <property name="leftMargin">
+       <number>14</number>
+      </property>
+      <property name="topMargin">
+       <number>10</number>
+      </property>
+      <property name="rightMargin">
+       <number>14</number>
+      </property>
+      <property name="bottomMargin">
+       <number>12</number>
+      </property>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <spacer name="networksSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeType">
+      <enum>QSizePolicy::Fixed</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>0</width>
+       <height>12</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item>
+    <widget class="QLabel" name="shellCommandsTitle">
+     <property name="text">
+      <string>Shell Commands</string>
+     </property>
+     <property name="textStyle" stdset="0">
+      <string>headline</string>
+     </property>
+     <property name="indent">
+      <number>8</number>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="FormSection" name="shellCommandsSection">
+     <layout class="QVBoxLayout" name="shellCommandsLayout">
+      <property name="leftMargin">
+       <number>14</number>
+      </property>
+      <property name="topMargin">
+       <number>10</number>
+      </property>
+      <property name="rightMargin">
+       <number>14</number>
+      </property>
+      <property name="bottomMargin">
+       <number>12</number>
+      </property>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>0</width>
+       <height>0</height>
+      </size>
+     </property>
+    </spacer>
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>FormSection</class>
+   <extends>QFrame</extends>
+   <header>vorta.views.partials.form_section</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

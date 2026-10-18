@@ -1,21 +1,14 @@
 from PyQt6 import QtCore, uic
-from PyQt6.QtCore import Qt
-from PyQt6.QtWidgets import (
-    QCheckBox,
-    QFormLayout,
-    QHBoxLayout,
-    QLabel,
-    QSizePolicy,
-    QSpacerItem,
-)
+from PyQt6.QtWidgets import QVBoxLayout
 
 from vorta.i18n import translate
 from vorta.store.models import SettingsModel
 from vorta.store.settings import get_grouped_checkbox_settings
 from vorta.utils import get_asset
+from vorta.views import theme
 from vorta.views.base_tab import BaseTab
-from vorta.views.partials.tooltip_button import ToolTipButton
-from vorta.views.utils import get_colored_icon
+from vorta.views.partials.form_section import FormSection, make_section_title
+from vorta.views.partials.switch import Switch
 
 uifile = get_asset('UI/misc_tab.ui')
 MiscTabUI, MiscTabBase = uic.loadUiType(uifile)
@@ -29,22 +22,16 @@ class MiscTab(BaseTab, MiscTabBase, MiscTabUI):
         super().__init__(parent=parent, profile_provider=profile_provider)
         self.setupUi(parent)
 
-        self.checkboxLayout = QFormLayout(self.frameSettings)
-        self.checkboxLayout.setSpacing(4)
-        self.checkboxLayout.setHorizontalSpacing(8)
-        self.checkboxLayout.setContentsMargins(0, 0, 0, 12)
-        self.checkboxLayout.setFieldGrowthPolicy(QFormLayout.FieldGrowthPolicy.FieldsStayAtSizeHint)
-        self.checkboxLayout.setFormAlignment(Qt.AlignmentFlag.AlignHCenter)
-        self.tooltip_buttons = []
+        self.checkboxLayout = QVBoxLayout(self.frameSettings)
+        self.checkboxLayout.setSpacing(theme.SPACE_S)
+        self.checkboxLayout.setContentsMargins(0, 0, 0, 0)
+        self.switches = []
 
         self.populate()
 
-        # Connect to events
-        self.track_palette_change()
-
     def populate(self):
         """
-        Populate the misc tab with the settings widgets.
+        Populate the settings view with one grouped section per settings group.
 
         Groups and per-group settings come from `get_grouped_checkbox_settings()`,
         which already filters out platform-irrelevant groups and legacy DB rows.
@@ -52,57 +39,27 @@ class MiscTab(BaseTab, MiscTabBase, MiscTabUI):
         # clear layout
         while self.checkboxLayout.count():
             child = self.checkboxLayout.takeAt(0)
-            self.checkboxLayout.removeItem(child)
             if child.widget():
                 child.widget().deleteLater()
-        self.tooltip_buttons = []
+        self.switches = []
 
-        i = 0
-        for group_name, settings in get_grouped_checkbox_settings():
-            # add spacer between groups
-            if i > 0:
-                spacer = QSpacerItem(20, 4, vPolicy=QSizePolicy.Policy.Fixed)
-                self.checkboxLayout.setItem(i, QFormLayout.ItemRole.LabelRole, spacer)
-                i += 1
+        for index, (group_name, settings) in enumerate(get_grouped_checkbox_settings()):
+            if index > 0:
+                self.checkboxLayout.addSpacing(theme.SPACE_M)
+            self.checkboxLayout.addWidget(make_section_title(translate('settings', group_name), self.frameSettings))
 
-            # add label for group
-            label = QLabel()
-            label.setText(translate('settings', group_name) + ':')
-            self.checkboxLayout.setWidget(i, QFormLayout.ItemRole.LabelRole, label)
-
-            # add settings widget of the group
+            section = FormSection(self.frameSettings)
+            rows = FormSection.configure_layout(QVBoxLayout(section))
             for setting in settings:
-                # create widget
-                cb = QCheckBox(translate('settings', setting.label))
-                cb.setToolTip(setting.tooltip)
-                cb.setCheckState(Qt.CheckState(setting.value))
-                cb.setTristate(False)
-                cb.stateChanged.connect(lambda v, key=setting.key: self.save_setting(key, v))
+                description = translate('settings', setting.tooltip) if setting.tooltip else ''
+                switch = Switch(translate('settings', setting.label), section, description=description)
+                switch.setChecked(bool(setting.value))
+                switch.stateChanged.connect(lambda v, key=setting.key: self.save_setting(key, v))
                 if setting.key == 'enable_fixed_units':
-                    cb.stateChanged.connect(self.refresh_archive.emit)
-
-                tb = ToolTipButton()
-                tb.setToolTip(setting.tooltip)
-
-                cbl = QHBoxLayout()
-                cbl.addWidget(cb)
-                if setting.tooltip:
-                    cbl.addWidget(tb)
-                cbl.addItem(QSpacerItem(0, 0, hPolicy=QSizePolicy.Policy.Expanding))
-
-                # add widget
-                self.checkboxLayout.setLayout(i, QFormLayout.ItemRole.FieldRole, cbl)
-                self.tooltip_buttons.append(tb)
-
-                # increase i
-                i += 1
-
-        self.set_icons()
-
-    def set_icons(self):
-        """Set or update the icons in this view."""
-        for button in self.tooltip_buttons:
-            button.setIcon(get_colored_icon('help-about'))
+                    switch.stateChanged.connect(self.refresh_archive.emit)
+                rows.addWidget(switch)
+                self.switches.append(switch)
+            self.checkboxLayout.addWidget(section)
 
     def save_setting(self, key, new_value):
         setting = SettingsModel.get(key=key)

@@ -6,7 +6,7 @@ from unittest.mock import Mock
 import pytest
 from PyQt6 import QtCore
 from PyQt6.QtGui import QCloseEvent
-from PyQt6.QtWidgets import QCheckBox, QFormLayout, QMessageBox
+from PyQt6.QtWidgets import QCheckBox, QMessageBox
 
 import vorta.autostart
 import vorta.store.connection
@@ -154,16 +154,13 @@ def test_toggle_file_logging(qapp, qtbot, monkeypatch):
 
 
 def _click_toggle_setting(setting, qapp, qtbot):
-    """Toggle setting checkbox in the misc tab"""
+    """Toggle setting switch in the settings window"""
     miscTab = qapp.main_window.miscTab
 
-    for x in range(miscTab.checkboxLayout.count()):
-        item = miscTab.checkboxLayout.itemAt(x, QFormLayout.ItemRole.FieldRole)
-        if item is not None:
-            checkbox = item.itemAt(0).widget()
-            if checkbox.text() == setting and isinstance(checkbox, QCheckBox):
-                # Have to use pos to click checkbox correctly
-                # https://stackoverflow.com/questions/19418125/pysides-qtest-not-checking-box/24070484#24070484
-                pos = QtCore.QPoint(2, int(checkbox.height() / 2))
-                qtbot.mouseClick(checkbox, QtCore.Qt.MouseButton.LeftButton, pos=pos)
-                break
+    for checkbox in miscTab.frameSettings.findChildren(QCheckBox):
+        if checkbox.text() == setting:
+            # Have to use pos to click checkbox correctly
+            # https://stackoverflow.com/questions/19418125/pysides-qtest-not-checking-box/24070484#24070484
+            pos = QtCore.QPoint(2, int(checkbox.height() / 2))
+            qtbot.mouseClick(checkbox, QtCore.Qt.MouseButton.LeftButton, pos=pos)
+            break

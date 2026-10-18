@@ -6,6 +6,7 @@ from vorta.profile_export import VersionException
 from vorta.store.connection import SCHEMA_VERSION
 from vorta.store.models import BackupProfileModel
 from vorta.views.dialogs.profile.export_window import ImportWindowBase, ImportWindowUI, logger
+from vorta.views.partials.form_section import add_sheet_header
 
 
 class ImportWindow(ImportWindowUI, ImportWindowBase):
@@ -18,6 +19,7 @@ class ImportWindow(ImportWindowUI, ImportWindowBase):
         super().__init__()
         self.profile_export = profile_export
         self.setupUi(self)
+        add_sheet_header(self.verticalLayout_2, self.tr("Import Profile"))
         self.init_repo_password_field(profile_export)
         self.init_overwrite_profile_checkbox()
         self.buttonBox.accepted.connect(self.run)

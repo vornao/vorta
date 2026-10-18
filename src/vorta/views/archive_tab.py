@@ -35,12 +35,14 @@ from vorta.views.archive.archive_maintenance import ArchiveMaintenance
 from vorta.views.archive.archive_mount import ArchiveMount
 from vorta.views.archive.archive_rename import ArchiveRename
 from vorta.views.base_tab import BaseTab
+from vorta.views.formatting import plural
 from vorta.views.partials.archive_table_model import ArchiveTableModel
 from vorta.views.partials.sort_proxy import SortProxyModel
 from vorta.views.utils import get_colored_icon
 
 uifile = get_asset('UI/archive_tab.ui')
 ArchiveTabUI, ArchiveTabBase = uic.loadUiType(uifile)
+RetentionPageUI, RetentionPageBase = uic.loadUiType(get_asset('UI/retention_page.ui'))
 
 logger = logging.getLogger(__name__)
 
@@ -52,19 +54,43 @@ class IconDelegate(QStyledItemDelegate):
         option.decorationSize = option.rect.size() - QtCore.QSize(0, 10)
 
 
+class RetentionPage(RetentionPageBase, RetentionPageUI):
+    """Prune and archive naming settings. Owned by the archive tab, shown on the Schedule page."""
+
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setupUi(self)
+        self.namingSection.setSeparators(False)
+
+
 class ArchiveTab(BaseTab, ArchiveTabBase, ArchiveTabUI):
     prune_intervals = ['hour', 'day', 'week', 'month', 'year']
+    retention_widgets = [
+        'pruningHelpLabel',
+        'prune_hour',
+        'prune_day',
+        'prune_week',
+        'prune_month',
+        'prune_year',
+        'prune_keep_within',
+        'prunePrefixTemplate',
+        'prunePrefixPreview',
+        'archiveNameTemplate',
+        'archiveNamePreview',
+    ]
 
     def __init__(self, parent=None, app=None, profile_provider=None):
         """Init."""
         super().__init__(parent=parent, profile_provider=profile_provider)
         self.setupUi(parent)
+        self.retentionPage = RetentionPage()
+        for name in self.retention_widgets:
+            setattr(self, name, getattr(self.retentionPage, name))
         self.is_editing = False  # track if the cell edit was completed or canceled
         self.mount_points = {}  # mapping of archive name to mount point
         self.repo_mount_point: Optional[str] = None  # mount point of whole repo
         self.menu = None
         self.app = app or self.app
-        self.toolBox.setCurrentIndex(0)
         self.repoactions_enabled = True
         self.renamed_archive_original_name = None
         self.remaining_refresh_archives = (
@@ -179,8 +205,6 @@ class ArchiveTab(BaseTab, ArchiveTabBase, ArchiveTabUI):
         self.bPrune.setIcon(get_colored_icon('cut'))
         self.bList.setIcon(get_colored_icon('refresh'))
         self.compactButton.setIcon(get_colored_icon('broom-solid'))
-        self.toolBox.setItemIcon(0, get_colored_icon('tasks'))
-        self.toolBox.setItemIcon(1, get_colored_icon('cut'))
         self.bRefreshArchive.setIcon(get_colored_icon('refresh'))
         self.bRename.setIcon(get_colored_icon('edit'))
         self.bDelete.setIcon(get_colored_icon('trash'))
@@ -243,7 +267,6 @@ class ArchiveTab(BaseTab, ArchiveTabBase, ArchiveTabUI):
             link(
                 'https://borgbackup.readthedocs.io/en/stable/usage/prune.html',
                 translate('Form', self.pruning_help_link_text),
-                color="#FF4500",
             ),
         )
         self.pruningHelpLabel.setText(format_richtext(prune_template, prune_sentence))
@@ -297,13 +320,8 @@ class ArchiveTab(BaseTab, ArchiveTabBase, ArchiveTabUI):
             if repo_mount_points:
                 self.repo_mount_point = repo_mount_points[0]
 
-            if profile.repo.name:
-                repo_name = f"{profile.repo.name} ({profile.repo.url})"
-            else:
-                repo_name = profile.repo.url
-            self.toolBox.setItemText(0, self.tr('Archives for {}').format(repo_name))
-
             archives = [s for s in profile.repo.archives.select().order_by(ArchiveModel.time.desc())]
+            self.repoActionsLabel.setText(plural('%n archive', '%n archives', len(archives)))
 
             # inject the user's fixed/dynamic unit setting so the model stays DB-free
             use_fixed_units = bool(SettingsModel.get(key='enable_fixed_units').value)
@@ -325,7 +343,7 @@ class ArchiveTab(BaseTab, ArchiveTabBase, ArchiveTabUI):
         else:
             self.mount_points = {}
             self.archive_model.set_rows([])
-            self.toolBox.setItemText(0, self.tr('Archives'))
+            self.repoActionsLabel.setText('')
             self._toggle_all_buttons(enabled=False)
 
         self.archiveNameTemplate.setText(profile.new_archive_name)

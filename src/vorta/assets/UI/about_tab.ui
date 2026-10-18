@@ -2,312 +2,100 @@
 <ui version="4.0">
  <class>Form</class>
  <widget class="QWidget" name="Form">
-  <property name="geometry">
-   <rect>
-    <x>0</x>
-    <y>0</y>
-    <width>791</width>
-    <height>497</height>
-   </rect>
-  </property>
-  <property name="windowTitle">
-   <string>Form</string>
-  </property>
-  <layout class="QHBoxLayout" name="horizontalLayout">
-   <property name="topMargin">
-    <number>12</number>
-   </property>
-   <property name="bottomMargin">
-    <number>12</number>
-   </property>
-   <item>
-    <spacer name="horizontalSpacer">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>40</width>
-       <height>20</height>
-      </size>
-     </property>
-    </spacer>
-   </item>
-   <item>
-    <layout class="QVBoxLayout" name="verticalLayout">
-     <property name="spacing">
-      <number>5</number>
-     </property>
-     <property name="topMargin">
-      <number>0</number>
-     </property>
-     <item>
-      <layout class="QVBoxLayout" name="verticalLayout">
-       <item>
-        <layout class="QHBoxLayout" name="horizontalLayout">
-         <property name="alignment">
-          <set>Qt::AlignHCenter</set>
-         </property>
-         <property name="spacing">
-          <number>5</number>
-         </property>
-         <property name="topMargin">
-          <number>10</number>
-         </property>
-         <item>
-          <widget class="QLabel" name="label_2">
-           <property name="text">
-            <string>Vorta Version:</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLabel" name="versionLabel">
-           <property name="text">
-            <string>0.0</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-       <item>
-        <layout class="QHBoxLayout" name="horizontalLayout">
-         <property name="alignment">
-          <set>Qt::AlignHCenter</set>
-         </property>
-         <property name="spacing">
-          <number>5</number>
-         </property>
-         <property name="topMargin">
-          <number>10</number>
-         </property>
-         <property name="bottomMargin">
-          <number>10</number>
-         </property>
-         <item>
-          <widget class="QLabel" name="label_3">
-           <property name="text">
-            <string>Borg Version:</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLabel" name="borgVersion">
-           <property name="text">
-            <string>1.1.8</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-       <item>
-        <layout class="QHBoxLayout" name="horizontalLayout">
-         <property name="bottomMargin">
-          <number>10</number>
-         </property>
-         <item>
-          <widget class="QLabel" name="borgPath">
-           <property name="text">
-            <string>/usr/bin/borg</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-       <item>
-        <widget class="QFrame" name="separator">
-         <property name="frameShape">
-          <enum>QFrame::HLine</enum>
-         </property>
-         <property name="frameShadow">
-          <enum>QFrame::Sunken</enum>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <layout class="QHBoxLayout" name="horizontalLayout">
-         <property name="alignment">
-          <set>Qt::AlignHCenter</set>
-         </property>
-         <property name="spacing">
-          <number>5</number>
-         </property>
-         <property name="topMargin">
-          <number>10</number>
-         </property>
-         <item>
-          <widget class="QLabel" name="bugReportLink">
-           <property name="text">
-            <string notr="true">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;%1&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-           </property>
-           <property name="openExternalLinks">
-            <bool>true</bool>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-       <item>
-        <layout class="QHBoxLayout" name="horizontalLayout">
-         <property name="alignment">
-          <set>Qt::AlignHCenter</set>
-         </property>
-         <property name="topMargin">
-          <number>10</number>
-         </property>
-         <item>
-          <widget class="QLabel" name="logLink">
-           <property name="text">
-            <string notr="true">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;%1&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-           </property>
-           <property name="indent">
-            <number>0</number>
-           </property>
-           <property name="openExternalLinks">
-            <bool>true</bool>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-       <item>
-        <layout class="QHBoxLayout" name="horizontalLayout">
-         <property name="alignment">
-          <set>Qt::AlignHCenter</set>
-         </property>
-         <property name="spacing">
-          <number>5</number>
-         </property>
-         <property name="topMargin">
-          <number>10</number>
-         </property>
-         <item>
-          <widget class="QLabel" name="docsLink">
-           <property name="text">
-            <string notr="true">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;%1&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-           </property>
-           <property name="openExternalLinks">
-            <bool>true</bool>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-       <item>
-        <layout class="QHBoxLayout" name="horizontalLayout">
-         <property name="alignment">
-          <set>Qt::AlignHCenter</set>
-         </property>
-         <property name="spacing">
-          <number>5</number>
-         </property>
-         <property name="topMargin">
-          <number>10</number>
-         </property>
-         <property name="bottomMargin">
-          <number>10</number>
-         </property>
-         <item>
-          <widget class="QLabel" name="repoLink">
-           <property name="text">
-            <string notr="true">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;%1&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-           </property>
-           <property name="openExternalLinks">
-            <bool>true</bool>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-       <item>
-        <widget class="QFrame" name="separator">
-         <property name="frameShape">
-          <enum>QFrame::HLine</enum>
-         </property>
-         <property name="frameShadow">
-          <enum>QFrame::Sunken</enum>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <layout class="QHBoxLayout" name="horizontalLayout">
-         <property name="alignment">
-          <set>Qt::AlignHCenter</set>
-         </property>
-         <property name="spacing">
-          <number>20</number>
-         </property>
-         <item>
-          <widget class="QLabel" name="copyrightLabel">
-           <property name="text">
-            <string>
+  <property name="geometry"><rect><x>0</x><y>0</y><width>420</width><height>480</height></rect></property>
+  <property name="windowTitle"><string>Form</string></property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <property name="spacing"><number>4</number></property>
+   <item><widget class="QLabel" name="appIcon">
+<property name="alignment"><set>Qt::AlignCenter</set></property>
+
+</widget></item>
+   <item><widget class="QLabel" name="appName">
+<property name="text"><string notr="true">Vorta</string></property>
+<property name="alignment"><set>Qt::AlignCenter</set></property>
+<property name="textStyle" stdset="0"><string>title1</string></property>
+
+</widget></item>
+   <item><spacer name="s0"><property name="orientation"><enum>Qt::Vertical</enum></property><property name="sizeType"><enum>QSizePolicy::Fixed</enum></property><property name="sizeHint" stdset="0"><size><width>0</width><height>14</height></size></property></spacer></item>
+   <item><layout class="QHBoxLayout" name="versionLabelRow"><property name="spacing"><number>6</number></property>
+<item><spacer name="versionLabelL"><property name="orientation"><enum>Qt::Horizontal</enum></property><property name="sizeHint" stdset="0"><size><width>0</width><height>0</height></size></property></spacer></item>
+<item><widget class="QLabel" name="label_version">
+<property name="text"><string>Vorta Version:</string></property>
+<property name="alignment"><set>Qt::AlignCenter</set></property>
+<property name="textRole" stdset="0"><string>secondary</string></property>
+
+</widget></item>
+<item><widget class="QLabel" name="versionLabel">
+<property name="text"><string notr="true">0.0</string></property>
+<property name="alignment"><set>Qt::AlignCenter</set></property>
+<property name="textInteractionFlags"><set>Qt::TextSelectableByMouse</set></property>
+</widget></item>
+<item><spacer name="versionLabelR"><property name="orientation"><enum>Qt::Horizontal</enum></property><property name="sizeHint" stdset="0"><size><width>0</width><height>0</height></size></property></spacer></item>
+</layout></item>
+   <item><layout class="QHBoxLayout" name="borgVersionRow"><property name="spacing"><number>6</number></property>
+<item><spacer name="borgVersionL"><property name="orientation"><enum>Qt::Horizontal</enum></property><property name="sizeHint" stdset="0"><size><width>0</width><height>0</height></size></property></spacer></item>
+<item><widget class="QLabel" name="label_borg">
+<property name="text"><string>Borg Version:</string></property>
+<property name="alignment"><set>Qt::AlignCenter</set></property>
+<property name="textRole" stdset="0"><string>secondary</string></property>
+
+</widget></item>
+<item><widget class="QLabel" name="borgVersion">
+<property name="text"><string notr="true">1.1.8</string></property>
+<property name="alignment"><set>Qt::AlignCenter</set></property>
+<property name="textInteractionFlags"><set>Qt::TextSelectableByMouse</set></property>
+</widget></item>
+<item><spacer name="borgVersionR"><property name="orientation"><enum>Qt::Horizontal</enum></property><property name="sizeHint" stdset="0"><size><width>0</width><height>0</height></size></property></spacer></item>
+</layout></item>
+   <item><widget class="QLabel" name="borgPath">
+<property name="text"><string notr="true">/usr/bin/borg</string></property>
+<property name="alignment"><set>Qt::AlignCenter</set></property>
+<property name="textStyle" stdset="0"><string>subheadline</string></property>
+<property name="textRole" stdset="0"><string>secondary</string></property>
+<property name="wordWrap"><bool>true</bool></property><property name="textInteractionFlags"><set>Qt::TextSelectableByMouse</set></property>
+</widget></item>
+   <item><spacer name="s1"><property name="orientation"><enum>Qt::Vertical</enum></property><property name="sizeType"><enum>QSizePolicy::Fixed</enum></property><property name="sizeHint" stdset="0"><size><width>0</width><height>14</height></size></property></spacer></item>
+   <item><widget class="QLabel" name="bugReportLink">
+<property name="text"><string notr="true">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;%1&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string></property>
+<property name="alignment"><set>Qt::AlignCenter</set></property>
+<property name="textStyle" stdset="0"><string>callout</string></property>
+<property name="openExternalLinks"><bool>true</bool></property>
+</widget></item><item><widget class="QLabel" name="docsLink">
+<property name="text"><string notr="true">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;%1&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string></property>
+<property name="alignment"><set>Qt::AlignCenter</set></property>
+<property name="textStyle" stdset="0"><string>callout</string></property>
+<property name="openExternalLinks"><bool>true</bool></property>
+</widget></item><item><widget class="QLabel" name="repoLink">
+<property name="text"><string notr="true">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;%1&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string></property>
+<property name="alignment"><set>Qt::AlignCenter</set></property>
+<property name="textStyle" stdset="0"><string>callout</string></property>
+<property name="openExternalLinks"><bool>true</bool></property>
+</widget></item><item><widget class="QLabel" name="logLink">
+<property name="text"><string notr="true">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;%1&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string></property>
+<property name="alignment"><set>Qt::AlignCenter</set></property>
+<property name="textStyle" stdset="0"><string>callout</string></property>
+<property name="openExternalLinks"><bool>true</bool></property>
+</widget></item>
+   <item><spacer name="s2"><property name="orientation"><enum>Qt::Vertical</enum></property><property name="sizeType"><enum>QSizePolicy::Fixed</enum></property><property name="sizeHint" stdset="0"><size><width>0</width><height>14</height></size></property></spacer></item>
+   <item><widget class="QLabel" name="copyrightLabel">
+<property name="text"><string>
              Vorta is a cross-platform, open-source client designed to simplify the management of Borg backups.
 
                       Copyright (C) 2018-2020 Manuel Riel and Vorta contributors (see CONTRIBUTORS.md)
-            </string>
-           </property>
-           <property name="indent">
-            <number>0</number>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-       <item>
-        <layout class="QHBoxLayout" name="horizontalLayout">
-         <property name="topMargin">
-          <number>10</number>
-         </property>
-         <property name="bottomMargin">
-          <number>10</number>
-         </property>
-         <property name="spacing">
-          <number>20</number>
-         </property>
-         <property name="alignment">
-          <set>Qt::AlignHCenter</set>
-         </property>
-         <item>
-          <widget class="QLabel" name="gpl_logo"/>
-         </item>
-         <item>
-          <widget class="QLabel" name="python_logo"/>
-         </item>
-        </layout>
-       </item>
-      </layout>
-     </item>
-     <item>
-      <spacer name="verticalSpacer">
-       <property name="orientation">
-        <enum>Qt::Vertical</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-    </layout>
-   </item>
-   <item>
-    <spacer name="horizontalSpacer">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>40</width>
-       <height>20</height>
-      </size>
-     </property>
-    </spacer>
-   </item>
+            </string></property>
+<property name="alignment"><set>Qt::AlignCenter</set></property>
+<property name="textStyle" stdset="0"><string>footnote</string></property>
+<property name="textRole" stdset="0"><string>secondary</string></property>
+<property name="wordWrap"><bool>true</bool></property>
+</widget></item>
+   <item><spacer name="s3"><property name="orientation"><enum>Qt::Vertical</enum></property><property name="sizeType"><enum>QSizePolicy::Fixed</enum></property><property name="sizeHint" stdset="0"><size><width>0</width><height>14</height></size></property></spacer></item>
+   <item><layout class="QHBoxLayout" name="logos"><property name="spacing"><number>16</number></property>
+     <item><spacer name="logosL"><property name="orientation"><enum>Qt::Horizontal</enum></property><property name="sizeHint" stdset="0"><size><width>0</width><height>0</height></size></property></spacer></item>
+     <item><widget class="QLabel" name="gpl_logo"/></item>
+     <item><widget class="QLabel" name="python_logo"/></item>
+     <item><spacer name="logosR"><property name="orientation"><enum>Qt::Horizontal</enum></property><property name="sizeHint" stdset="0"><size><width>0</width><height>0</height></size></property></spacer></item>
+   </layout></item>
+   <item><spacer name="bottom"><property name="orientation"><enum>Qt::Vertical</enum></property><property name="sizeHint" stdset="0"><size><width>0</width><height>0</height></size></property></spacer></item>
   </layout>
  </widget>
  <resources/>

@@ -6,148 +6,138 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>791</width>
-    <height>497</height>
+    <width>760</width>
+    <height>520</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_2" stretch="2">
+  <layout class="QVBoxLayout" name="verticalLayout">
    <property name="spacing">
-    <number>12</number>
+    <number>10</number>
+   </property>
+   <property name="leftMargin">
+    <number>24</number>
    </property>
    <property name="topMargin">
-    <number>12</number>
+    <number>8</number>
+   </property>
+   <property name="rightMargin">
+    <number>24</number>
    </property>
    <property name="bottomMargin">
-    <number>12</number>
+    <number>20</number>
    </property>
    <item>
-    <widget class="QFrame" name="frame">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-       <horstretch>0</horstretch>
-       <verstretch>1</verstretch>
-      </sizepolicy>
+    <widget class="QLabel" name="label_6">
+     <property name="text">
+      <string>Source Folders and Files to Back Up:</string>
      </property>
-     <property name="frameShape">
-      <enum>QFrame::NoFrame</enum>
+     <property name="textRole" stdset="0">
+      <string>secondary</string>
      </property>
-     <property name="frameShadow">
-      <enum>QFrame::Raised</enum>
-     </property>
-     <layout class="QVBoxLayout" name="verticalLayout">
-      <property name="leftMargin">
-       <number>0</number>
-      </property>
-      <property name="topMargin">
-       <number>0</number>
-      </property>
-      <property name="rightMargin">
-       <number>0</number>
-      </property>
-      <property name="bottomMargin">
-       <number>0</number>
-      </property>
-      <item>
-       <widget class="QLabel" name="label_6">
-        <property name="text">
-         <string>Source Folders and Files to Back Up:</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QTableView" name="sourceFilesWidget">
-        <property name="enabled">
-         <bool>true</bool>
-        </property>
-        <property name="editTriggers">
-         <set>QAbstractItemView::NoEditTriggers</set>
-        </property>
-        <property name="selectionMode">
-         <enum>QAbstractItemView::ExtendedSelection</enum>
-        </property>
-        <property name="selectionBehavior">
-         <enum>QAbstractItemView::SelectRows</enum>
-        </property>
-        <property name="sortingEnabled">
-         <bool>true</bool>
-        </property>
-        <attribute name="horizontalHeaderHighlightSections">
-         <bool>false</bool>
-        </attribute>
-        <attribute name="verticalHeaderVisible">
-         <bool>false</bool>
-        </attribute>
-        <attribute name="verticalHeaderHighlightSections">
-         <bool>false</bool>
-        </attribute>
-       </widget>
-      </item>
-      <item>
-       <layout class="QHBoxLayout" name="horizontalLayout_2">
-        <item>
-         <widget class="QToolButton" name="updateButton">
-          <property name="toolTip">
-           <string>Recalculate source size and file count</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="bExclude">
-          <property name="text">
-           <string>Manage Excluded Items…</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <layout class="QHBoxLayout" name="horizontalLayout"/>
-        </item>
-        <item>
-         <widget class="QLabel" name="totalSizeLabel">
-          <property name="text">
-           <string/>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignRight|Qt::AlignVCenter</set>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <spacer name="horizontalSpacer">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>40</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item>
-         <widget class="QToolButton" name="addButton">
-          <property name="toolTip">
-           <string>Add sources</string>
-          </property>
-          <property name="popupMode">
-           <enum>QToolButton::InstantPopup</enum>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QToolButton" name="removeButton">
-          <property name="toolTip">
-           <string>Remove the selected source</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </item>
-     </layout>
     </widget>
+   </item>
+   <item>
+    <widget class="QStackedWidget" name="sourcesStack">
+     <widget class="QWidget" name="sourcesEmptyPage">
+      <layout class="QVBoxLayout" name="sourcesEmptyLayout">
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
+      </layout>
+     </widget>
+     <widget class="QTableView" name="sourceFilesWidget">
+      <property name="editTriggers">
+       <set>QAbstractItemView::NoEditTriggers</set>
+      </property>
+      <property name="selectionMode">
+       <enum>QAbstractItemView::ExtendedSelection</enum>
+      </property>
+      <property name="selectionBehavior">
+       <enum>QAbstractItemView::SelectRows</enum>
+      </property>
+      <property name="showGrid">
+       <bool>false</bool>
+      </property>
+      <property name="sortingEnabled">
+       <bool>true</bool>
+      </property>
+      <property name="wordWrap">
+       <bool>false</bool>
+      </property>
+      <attribute name="verticalHeaderVisible">
+       <bool>false</bool>
+      </attribute>
+      <attribute name="horizontalHeaderHighlightSections">
+       <bool>false</bool>
+      </attribute>
+     </widget>
+    </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="bottomBar">
+     <property name="spacing">
+      <number>6</number>
+     </property>
+     <item>
+      <widget class="QToolButton" name="addButton">
+       <property name="toolTip">
+        <string>Add sources</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="removeButton">
+       <property name="toolTip">
+        <string>Remove the selected source</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="updateButton">
+       <property name="toolTip">
+        <string>Recalculate source size and file count</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="totalSizeLabel">
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignVCenter</set>
+       </property>
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+         <horstretch>1</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="textStyle" stdset="0">
+        <string>callout</string>
+       </property>
+       <property name="textRole" stdset="0">
+        <string>secondary</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="bExclude">
+       <property name="text">
+        <string>Manage Excluded Items…</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </item>
   </layout>
  </widget>

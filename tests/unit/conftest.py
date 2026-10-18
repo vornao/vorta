@@ -240,7 +240,7 @@ def archive_env(qapp, qtbot):
     """
     main: MainWindow = qapp.main_window
     tab: ArchiveTab = main.archiveTab
-    main.tabWidget.setCurrentIndex(3)
+    main.show_page('archives')
     tab.populate_from_profile()
     qtbot.waitUntil(lambda: tab.archiveTable.model().rowCount() == 2, **pytest._wait_defaults)
     return main, tab

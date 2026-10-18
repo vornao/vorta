@@ -18,21 +18,22 @@ def test_profile_add_delete(qapp, qtbot, mocker):
     save_button = add_profile_window.buttonBox.button(QDialogButtonBox.StandardButton.Save)
     qtbot.mouseClick(save_button, QtCore.Qt.MouseButton.LeftButton)
     assert BackupProfileModel.get_or_none(name='Test Profile') is not None
-    assert main.profileSelector.currentItem().text() == 'Test Profile'
+    assert main.profileSelector.currentText() == 'Test Profile'
 
     # delete the new profile and ensure it is no longer available.
     mocker.patch.object(QMessageBox, 'question', return_value=QMessageBox.StandardButton.Yes)
-    qtbot.mouseClick(main.profileDeleteButton, QtCore.Qt.MouseButton.LeftButton)
+    main.profileDeleteAction.trigger()
     assert BackupProfileModel.get_or_none(name='Test Profile') is None
-    assert main.profileSelector.currentItem().text() == 'Default'
+    assert main.profileSelector.currentText() == 'Default'
 
     # attempt to delete the last remaining profile
     # see that it cannot be deleted, a warning is displayed, and the profile remains
     warning = mocker.patch.object(QToolTip, 'showText')
-    qtbot.mouseClick(main.profileDeleteButton, QtCore.Qt.MouseButton.LeftButton)
+    assert not main.profileDeleteAction.isEnabled()
+    main.profile_delete_action()
     assert "Cannot delete the last profile." in warning.call_args[0][1]
     assert BackupProfileModel.get_or_none(name='Default') is not None
-    assert main.profileSelector.currentItem().text() == 'Default'
+    assert main.profileSelector.currentText() == 'Default'
 
 
 def test_profile_edit(qapp, qtbot):
@@ -40,7 +41,7 @@ def test_profile_edit(qapp, qtbot):
     main = qapp.main_window
 
     # click to rename profile, clear the name field, type new profile name
-    qtbot.mouseClick(main.profileRenameButton, QtCore.Qt.MouseButton.LeftButton)
+    main.profileRenameAction.trigger()
     edit_profile_window = main.window
     edit_profile_window.profileNameField.setText("")
     qtbot.keyClicks(edit_profile_window.profileNameField, 'Test Profile')
@@ -50,7 +51,7 @@ def test_profile_edit(qapp, qtbot):
     # assert a profile by the old name no longer exists, and the newly named profile does exist and is selected.
     assert BackupProfileModel.get_or_none(name='Default') is None
     assert BackupProfileModel.get_or_none(name='Test Profile') is not None
-    assert main.profileSelector.currentItem().text() == 'Test Profile'
+    assert main.profileSelector.currentText() == 'Test Profile'
 
 
 def test_profile_import_no_duplicate_sources(qapp, qtbot, mocker):

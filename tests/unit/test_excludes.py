@@ -6,7 +6,7 @@ from PyQt6 import QtCore
 def test_exclusion_preview_populated(qapp, qtbot):
     main = qapp.main_window
     tab = main.sourceTab
-    main.tabWidget.setCurrentIndex(1)
+    main.show_page('sources')
 
     qtbot.mouseClick(tab.bExclude, QtCore.Qt.MouseButton.LeftButton)
     qtbot.mouseClick(tab._window.bAddPattern, QtCore.Qt.MouseButton.LeftButton)

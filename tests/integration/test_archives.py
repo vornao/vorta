@@ -23,7 +23,7 @@ def test_repo_list(qapp, qtbot):
     """Test that the archives are created and repo list is populated correctly"""
     main = qapp.main_window
     tab = main.archiveTab
-    main.tabWidget.setCurrentIndex(3)
+    main.show_page('archives')
     tab.refresh_archive_list()
     qtbot.waitUntil(lambda: not tab.bCheck.isEnabled(), **pytest._wait_defaults)
     assert not tab.bCheck.isEnabled()

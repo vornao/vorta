@@ -303,7 +303,7 @@ def test_deleting_a_paused_profile_clears_the_pause(qapp, qtbot, mocker):
     prepare_mock = mocker.patch('vorta.scheduler.execution.BorgCreateJob.prepare')
     mocker.patch.object(QMessageBox, 'question', return_value=QMessageBox.StandardButton.Yes)
     mocker.patch.object(qapp.scheduler._timers, '_net_up', True)
-    qtbot.mouseClick(main.profileDeleteButton, QtCore.Qt.MouseButton.LeftButton)
+    main.profile_delete_action()
 
     # The overdue occurrence must not start a backup on the profile being deleted.
     prepare_mock.assert_not_called()

@@ -32,6 +32,7 @@ class AboutTab(BaseTab, AboutTabBase, AboutTabUI):
         self.click_here = QT_TRANSLATE_NOOP('Form', 'Click here')
         self.view_logs_text = QT_TRANSLATE_NOOP('Form', 'View the logs')
         self._set_links()
+        self.appIcon.setPixmap(get_colored_icon('icon', scaled_height=96, return_qpixmap=True))
         self.gpl_logo.setPixmap(get_colored_icon('gpl_logo', scaled_height=40, return_qpixmap=True))
         self.python_logo.setPixmap(get_colored_icon('python_logo', scaled_height=40, return_qpixmap=True))
         copyright_text = self.copyrightLabel.text()

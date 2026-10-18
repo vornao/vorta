@@ -1,13 +1,10 @@
 import logging
 
 from PyQt6 import QtCore, uic
-from PyQt6.QtCore import QDateTime, QLocale
-from PyQt6.QtWidgets import QApplication
 
-from vorta.i18n import get_locale
-from vorta.scheduler import ScheduleStatusType
 from vorta.utils import get_asset
 from vorta.views.base_tab import BaseTab
+from vorta.views.formatting import next_backup_text, next_backup_tooltip
 
 logger = logging.getLogger(__name__)
 uifile = get_asset('UI/schedule_page.ui')
@@ -108,17 +105,7 @@ class SchedulePage(BaseTab, SchedulePageBase, SchedulePageUI):
         self.draw_next_scheduled_backup()
 
     def draw_next_scheduled_backup(self):
-        status = self.app.scheduler.next_job_for_profile(self.profile().id)
-        if status.type == ScheduleStatusType.SCHEDULED:
-            time = QDateTime.fromMSecsSinceEpoch(int(status.time.timestamp() * 1000))
-            text = get_locale().toString(time, QLocale.FormatType.LongFormat)
-        elif status.type == ScheduleStatusType.PAUSED:
-            time = QDateTime.fromMSecsSinceEpoch(int(status.time.timestamp() * 1000))
-            text = self.tr('Paused until %s') % get_locale().toString(time, QLocale.FormatType.LongFormat)
-        elif status.type == ScheduleStatusType.NO_PREVIOUS_BACKUP:
-            text = self.tr('Run a manual backup first')
-        else:
-            text = self.tr('None scheduled')
-
+        text = next_backup_text(self.app.scheduler, self.profile().id)
         self.nextBackupDateTimeLabel.setText(text)
+        self.nextBackupDateTimeLabel.setToolTip(next_backup_tooltip(self.app.scheduler, self.profile().id))
         self.nextBackupDateTimeLabel.repaint()

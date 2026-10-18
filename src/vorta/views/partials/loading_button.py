@@ -1,31 +1,34 @@
-"""
-Adapted from https://stackoverflow.com/questions/53618971/how-to-make-a-qpushbutton-a-loading-button
-"""
-
-from PyQt6 import QtCore, QtGui, QtWidgets
+from PyQt6 import QtCore, QtWidgets
 
 
 class LoadingButton(QtWidgets.QPushButton):
+    """
+    A push button with a busy state.
+
+    The busy state is shown elsewhere (the window's activity indicator), so the
+    button only tracks it. `setGif` is kept for API compatibility.
+    """
+
+    busy_changed = QtCore.pyqtSignal(bool)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._busy = False
+
     @QtCore.pyqtSlot()
     def start(self):
-        if hasattr(self, "_movie"):
-            self._movie.start()
+        if not self._busy:
+            self._busy = True
+            self.busy_changed.emit(True)
 
     @QtCore.pyqtSlot()
     def stop(self):
-        if hasattr(self, "_movie"):
-            self._movie.stop()
-            self.setIcon(QtGui.QIcon())
+        if self._busy:
+            self._busy = False
+            self.busy_changed.emit(False)
+
+    def is_busy(self) -> bool:
+        return self._busy
 
     def setGif(self, filename):
-        if not hasattr(self, "_movie"):
-            self._movie = QtGui.QMovie(self)
-            self._movie.setFileName(filename)
-            self._movie.frameChanged.connect(self.on_frameChanged)
-            if self._movie.loopCount() != -1:
-                self._movie.finished.connect(self.start)
-        self.stop()
-
-    @QtCore.pyqtSlot(int)
-    def on_frameChanged(self, frameNumber):
-        self.setIcon(QtGui.QIcon(self._movie.currentPixmap()))
+        pass

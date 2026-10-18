@@ -2,25 +2,27 @@ import json
 import os
 import sys
 
-from PyQt6.QtGui import QIcon, QImage, QPixmap
-
-from vorta.utils import get_asset, uses_dark_mode
+from vorta.views.icons import has_symbol, legacy_svg_icon, symbol_icon, symbol_pixmap
 
 
 def get_colored_icon(icon_name, scaled_height=128, return_qpixmap=False):
     """
-    Return SVG icon in the correct color.
-    """
-    with open(get_asset(f"icons/{icon_name}.svg"), 'rb') as svg_file:
-        svg_str = svg_file.read()
-    if uses_dark_mode():
-        svg_str = svg_str.replace(b'#000000', b'#ffffff')
-    svg_img = QImage.fromData(svg_str).scaledToHeight(scaled_height)
+    Return an icon in the colour of the current theme.
 
-    if return_qpixmap:
-        return QPixmap(svg_img)
-    else:
-        return QIcon(QPixmap(svg_img))
+    Known icon names render as SF Symbols on macOS (bundled SVGs elsewhere) and
+    follow light/dark mode automatically. Other assets, like logos, use the
+    recoloured SVG.
+    """
+    if has_symbol(icon_name):
+        if return_qpixmap:
+            return symbol_pixmap(icon_name, scaled_height)
+        return symbol_icon(icon_name)
+    return legacy_svg_icon(icon_name, scaled_height, return_qpixmap)
+
+
+def popup_menu(button, menu):
+    """Show `menu` under `button`, like a pull-down button without a menu arrow."""
+    menu.popup(button.mapToGlobal(button.rect().bottomLeft()))
 
 
 def get_exclusion_presets():

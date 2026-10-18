@@ -57,7 +57,7 @@ class SSHAddWindow(SSHAddBase, SSHAddUI):
         link_text = translate('Dialog', self.key_size_help_link)
         sentence = format_richtext(
             escape(sentence_template),
-            link('https://stribika.github.io/2015/01/04/secure-secure-shell.html', link_text, color="#0000ff"),
+            link('https://stribika.github.io/2015/01/04/secure-secure-shell.html', link_text),
         )
         self.keySizeHelpLabel.setText(format_richtext(template, sentence))
 

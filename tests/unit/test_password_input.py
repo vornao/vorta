@@ -1,6 +1,7 @@
 import pytest
 from PyQt6.QtWidgets import QFormLayout, QWidget
 
+from vorta.views import theme
 from vorta.views.partials.password_input import PasswordInput, PasswordLineEdit
 
 
@@ -40,7 +41,10 @@ def test_password_line_error_state(qtbot):
 
     password_line_edit.error_state = True
     assert password_line_edit.error_state
-    assert password_line_edit.styleSheet() == "QLineEdit { border: 2px solid red; }"
+    assert f"border: 2px solid {theme.danger_color().name()}" in password_line_edit.styleSheet()
+
+    password_line_edit.error_state = False
+    assert password_line_edit.styleSheet() == ""
 
 
 def test_password_line_visibility_button(qtbot):

@@ -1,0 +1,419 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Form</class>
+ <widget class="QWidget" name="RetentionPage">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>680</width>
+    <height>420</height>
+   </rect>
+  </property>
+  <layout class="QVBoxLayout" name="retentionLayout">
+   <property name="spacing">
+    <number>8</number>
+   </property>
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
+    <number>12</number>
+   </property>
+   <item>
+    <widget class="QLabel" name="pruneTitle">
+     <property name="text">
+      <string>Prune Options</string>
+     </property>
+     <property name="textStyle" stdset="0">
+      <string>headline</string>
+     </property>
+     <property name="indent">
+      <number>8</number>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="FormSection" name="pruneSection">
+     <layout class="QVBoxLayout" name="verticalLayout_4">
+      <property name="spacing">
+       <number>18</number>
+      </property>
+      <property name="leftMargin">
+       <number>14</number>
+      </property>
+      <property name="topMargin">
+       <number>12</number>
+      </property>
+      <property name="rightMargin">
+       <number>14</number>
+      </property>
+      <property name="bottomMargin">
+       <number>12</number>
+      </property>
+      <item>
+       <widget class="QLabel" name="pruningHelpLabel">
+        <property name="text">
+         <string notr="true">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;%1&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+        <property name="wordWrap">
+         <bool>true</bool>
+        </property>
+        <property name="openExternalLinks">
+         <bool>true</bool>
+        </property>
+        <property name="textStyle" stdset="0">
+         <string>subheadline</string>
+        </property>
+        <property name="textRole" stdset="0">
+         <string>secondary</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <layout class="QGridLayout" name="horizontalLayout_7">
+        <property name="horizontalSpacing">
+         <number>12</number>
+        </property>
+        <property name="verticalSpacing">
+         <number>4</number>
+        </property>
+        <item row="0" column="0">
+         <widget class="QLabel" name="label_6">
+          <property name="text">
+           <string>Hourly:</string>
+          </property>
+          <property name="textStyle" stdset="0">
+           <string>subheadline</string>
+          </property>
+          <property name="textRole" stdset="0">
+           <string>secondary</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QSpinBox" name="prune_hour">
+          <property name="toolTip">
+           <string>Use -1 for unlimited</string>
+          </property>
+          <property name="minimum">
+           <number>-1</number>
+          </property>
+          <property name="maximum">
+           <number>65535</number>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QLabel" name="label_7">
+          <property name="text">
+           <string>Daily:</string>
+          </property>
+          <property name="textStyle" stdset="0">
+           <string>subheadline</string>
+          </property>
+          <property name="textRole" stdset="0">
+           <string>secondary</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="QSpinBox" name="prune_day">
+          <property name="toolTip">
+           <string>Use -1 for unlimited</string>
+          </property>
+          <property name="minimum">
+           <number>-1</number>
+          </property>
+          <property name="maximum">
+           <number>65535</number>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="2">
+         <widget class="QLabel" name="label_8">
+          <property name="text">
+           <string>Weekly:</string>
+          </property>
+          <property name="textStyle" stdset="0">
+           <string>subheadline</string>
+          </property>
+          <property name="textRole" stdset="0">
+           <string>secondary</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="2">
+         <widget class="QSpinBox" name="prune_week">
+          <property name="toolTip">
+           <string>Use -1 for unlimited</string>
+          </property>
+          <property name="minimum">
+           <number>-1</number>
+          </property>
+          <property name="maximum">
+           <number>65535</number>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="3">
+         <widget class="QLabel" name="label_9">
+          <property name="text">
+           <string>Monthly:</string>
+          </property>
+          <property name="textStyle" stdset="0">
+           <string>subheadline</string>
+          </property>
+          <property name="textRole" stdset="0">
+           <string>secondary</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="3">
+         <widget class="QSpinBox" name="prune_month">
+          <property name="toolTip">
+           <string>Use -1 for unlimited</string>
+          </property>
+          <property name="minimum">
+           <number>-1</number>
+          </property>
+          <property name="maximum">
+           <number>65535</number>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="4">
+         <widget class="QLabel" name="label_10">
+          <property name="text">
+           <string>Annual:</string>
+          </property>
+          <property name="textStyle" stdset="0">
+           <string>subheadline</string>
+          </property>
+          <property name="textRole" stdset="0">
+           <string>secondary</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="4">
+         <widget class="QSpinBox" name="prune_year">
+          <property name="toolTip">
+           <string>Use -1 for unlimited</string>
+          </property>
+          <property name="minimum">
+           <number>-1</number>
+          </property>
+          <property name="maximum">
+           <number>65535</number>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="5" rowspan="2">
+         <spacer name="pruneSpinSpacer">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>0</width>
+            <height>0</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_2">
+        <property name="spacing">
+         <number>10</number>
+        </property>
+        <item>
+         <widget class="QLabel" name="label_2">
+          <property name="text">
+           <string>No matter what, keep all archives of the last:</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="keepWithinSpacer">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>0</width>
+            <height>0</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="QLineEdit" name="prune_keep_within">
+          <property name="maximumSize">
+           <size>
+            <width>180</width>
+            <height>16777215</height>
+           </size>
+          </property>
+          <property name="toolTip">
+           <string>“&lt;int&gt;&lt;char&gt;”, where char is “H”, “d”, “w”, “m”, “y”</string>
+          </property>
+          <property name="placeholderText">
+           <string>24H, 1d, 52w, 12m, 1y</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QGridLayout" name="gridLayout_2">
+        <property name="horizontalSpacing">
+         <number>10</number>
+        </property>
+        <property name="verticalSpacing">
+         <number>4</number>
+        </property>
+        <item row="0" column="0">
+         <widget class="QLabel" name="label_4">
+          <property name="text">
+           <string>Prune Prefix:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QLineEdit" name="prunePrefixTemplate">
+          <property name="toolTip">
+           <string>Available variables: hostname, fqdn, profile_id, profile_slug, now, utc_now, user</string>
+          </property>
+          <property name="placeholderText">
+           <string>{hostname}-{profile_slug}-</string>
+          </property>
+          <property name="textStyle" stdset="0">
+           <string>monospace</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="QLabel" name="prunePrefixPreview">
+          <property name="textStyle" stdset="0">
+           <string>subheadline</string>
+          </property>
+          <property name="textRole" stdset="0">
+           <string>secondary</string>
+          </property>
+          <property name="textInteractionFlags">
+           <set>Qt::TextSelectableByMouse</set>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <spacer name="sectionSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeType">
+      <enum>QSizePolicy::Fixed</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>0</width>
+       <height>12</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item>
+    <widget class="QLabel" name="namingTitle">
+     <property name="text">
+      <string>Archive Naming</string>
+     </property>
+     <property name="textStyle" stdset="0">
+      <string>headline</string>
+     </property>
+     <property name="indent">
+      <number>8</number>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="FormSection" name="namingSection">
+     <layout class="QGridLayout" name="gridLayout_4">
+      <property name="leftMargin">
+       <number>14</number>
+      </property>
+      <property name="topMargin">
+       <number>12</number>
+      </property>
+      <property name="rightMargin">
+       <number>14</number>
+      </property>
+      <property name="bottomMargin">
+       <number>12</number>
+      </property>
+      <property name="horizontalSpacing">
+       <number>10</number>
+      </property>
+      <property name="verticalSpacing">
+       <number>4</number>
+      </property>
+      <item row="0" column="0">
+       <widget class="QLabel" name="label_3">
+        <property name="text">
+         <string>Archive Name:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QLineEdit" name="archiveNameTemplate">
+        <property name="toolTip">
+         <string>Available variables: hostname, fqdn, profile_id, profile_slug, now, utc_now, user</string>
+        </property>
+        <property name="placeholderText">
+         <string>{hostname}-{profile_slug}-{now:%Y-%m-%d-%H%M%S}</string>
+        </property>
+        <property name="textStyle" stdset="0">
+         <string>monospace</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QLabel" name="archiveNamePreview">
+        <property name="textStyle" stdset="0">
+         <string>subheadline</string>
+        </property>
+        <property name="textRole" stdset="0">
+         <string>secondary</string>
+        </property>
+        <property name="textInteractionFlags">
+         <set>Qt::TextSelectableByMouse</set>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>FormSection</class>
+   <extends>QFrame</extends>
+   <header>vorta.views.partials.form_section</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>

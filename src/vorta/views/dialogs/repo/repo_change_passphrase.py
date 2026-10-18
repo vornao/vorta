@@ -4,6 +4,7 @@ from PyQt6.QtWidgets import QApplication, QDialogButtonBox, QLabel
 from vorta.borg.change_passphrase import BorgChangePassJob
 from vorta.keyring.abc import VortaKeyring
 from vorta.utils import get_asset
+from vorta.views import theme
 from vorta.views.partials.password_input import PasswordInput
 
 uifile = get_asset('UI/dialogs/repo/change_passphrase.ui')
@@ -33,7 +34,7 @@ class ChangeBorgPassphraseWindow(ChangeBorgPassBase, ChangeBorgPassUI):
         self.saveButton.setText(self.tr("Update"))
 
         self.errorText = QLabel("")
-        self.errorText.setStyleSheet("color: red")
+        theme.apply_text_role(self.errorText, 'danger')
         self.repoDataFormLayout.addRow("", self.errorText)
 
         self.buttonBox.rejected.connect(self.close)

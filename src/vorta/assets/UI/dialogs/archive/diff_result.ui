@@ -27,6 +27,9 @@
        <property name="text">
         <string>nyx2.local-2018-11-16T09:49:58 </string>
        </property>
+       <property name="textStyle" stdset="0">
+        <string>headline</string>
+       </property>
       </widget>
      </item>
      <item>
@@ -34,12 +37,18 @@
        <property name="text">
         <string notr="true">↔</string>
        </property>
+       <property name="textRole" stdset="0">
+        <string>secondary</string>
+       </property>
       </widget>
      </item>
      <item>
       <widget class="QLabel" name="archiveNameLabel_2">
        <property name="text">
         <string>nyx2.local-2018-10-16T09:49:58 </string>
+       </property>
+       <property name="textStyle" stdset="0">
+        <string>headline</string>
        </property>
       </widget>
      </item>
@@ -116,7 +125,7 @@
     </layout>
    </item>
    <item>
-    <widget class="QTreeView" name="treeView"/>
+    <widget class="QTreeView" name="treeView" />
    </item>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
@@ -138,6 +147,6 @@
   <tabstop>treeView</tabstop>
   <tabstop>comboBoxDisplayMode</tabstop>
  </tabstops>
- <resources/>
- <connections/>
+ <resources />
+ <connections />
 </ui>

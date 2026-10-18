@@ -26,16 +26,14 @@
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
-     <property name="font">
-      <font>
-       <bold>true</bold>
-      </font>
-     </property>
      <property name="text">
       <string>Add Backup Profile</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignCenter</set>
+     </property>
+     <property name="textStyle" stdset="0">
+      <string>title3</string>
      </property>
     </widget>
    </item>
@@ -46,11 +44,6 @@
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
-     </property>
-     <property name="font">
-      <font>
-       <pointsize>12</pointsize>
-      </font>
      </property>
      <property name="text">
       <string notr="true">&lt;html&gt;&lt;head/&gt;&lt;body&gt;
@@ -63,6 +56,12 @@
      </property>
      <property name="wordWrap">
       <bool>true</bool>
+     </property>
+     <property name="textStyle" stdset="0">
+      <string>callout</string>
+     </property>
+     <property name="textRole" stdset="0">
+      <string>secondary</string>
      </property>
     </widget>
    </item>
@@ -115,10 +114,11 @@
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
-        <property name="font">
-         <font>
-          <pointsize>11</pointsize>
-         </font>
+        <property name="textStyle" stdset="0">
+         <string>callout</string>
+        </property>
+        <property name="textRole" stdset="0">
+         <string>danger</string>
         </property>
        </widget>
       </item>
@@ -140,7 +140,7 @@
  <tabstops>
   <tabstop>profileNameField</tabstop>
  </tabstops>
- <resources/>
+ <resources />
  <connections>
   <connection>
    <sender>buttonBox</sender>
